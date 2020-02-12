@@ -63,7 +63,7 @@ gitLogCommand.stdout.on('end', () => {
   console.log('creating:', `${componentName}-${versionAsString}`)
 
   !existsSync(componentPath) && mkdirSync(componentPath)
-  copyFileSync(`${__dirname}/../dist/bundles/main.bundle.js`, `${componentPath}/index.js`)
+  copyFileSync(`${__dirname}/../dist/main.bundle.js`, `${componentPath}/index.js`)
 
   writeFileSync(`${componentPath}/package.json`, JSON.stringify({
     name: `@gluecodes/${componentName}`,
