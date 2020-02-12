@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  gluecodes_framework:
+    build:
+      context: ..
+      dockerfile: ./gluecodes-framework/Dockerfile
+    container_name: gluecodes_framework
+    command: "tail -f /dev/null"
+    volumes:
+      - .:/src/gluecodes-framework:rw
+      - /src/gluecodes-framework/node_modules
+    env_file:
+      - .env
