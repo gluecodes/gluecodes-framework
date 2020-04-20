@@ -18,8 +18,6 @@ export default ({
   }
 
   module.setRenderer(renderer)
-  module.setExternalStyles(externalStyles)
-  module.setFontAwesome(fontAwesome)
 
   // import fonts
   module.googleFonts.forEach((font) => {
@@ -40,7 +38,13 @@ export default ({
   })
 
   return (props) => {
-    const vDomNode = module.default(props)
+    const vDomNode = module.default({
+      ...props,
+      _inject: {
+        externalStyles,
+        fa: fontAwesome
+      }
+    })
 
     if (vDomNode) {
       vDomNode.properties.className = `${vDomNode.properties.className || ''} gc-role-${scopeName}-${roleName}`.trim()

@@ -16,10 +16,13 @@ export default ({
     ].join(' ')
   }
 
-  module.setExternalStyles(externalStyles)
-  module.setFontAwesome(fontAwesome)
-
-  const html = module.prerender(props).trim()
+  const html = module.prerender({
+    ...props,
+    _inject: {
+      externalStyles,
+      fa: fontAwesome
+    }
+  }).trim()
 
   let scopedHtml = html.replace(/^(<[^<>]+)(class="[^"]*)/, `$1$2 gc-role-${scopeName}-${roleName}`)
 
