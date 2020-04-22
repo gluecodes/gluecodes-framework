@@ -2,9 +2,14 @@ export default ({
   bootstrap,
   fontAwesome,
   renderer
-}) => (module, { styles, roleName, scopeName }) => {
+}) => (module, { styles, registry, roleName, scopeName }) => {
   const externalStyles = { ...bootstrap }
   const componentClassMap = styles
+  const injectables = {
+    externalStyles,
+    fa: fontAwesome
+  }
+  let component
 
   for (const className of Object.keys(componentClassMap)) {
     if (!module.customizableClasses.includes(className)) {
@@ -37,13 +42,18 @@ export default ({
     global.document.head.appendChild(fontFaceNode)
   })
 
+  if (registry) {
+    component = module.default(Object.assign(registry, {
+      _inject: injectables
+    }))
+  } else {
+    component = module.default
+  }
+
   return (props) => {
-    const vDomNode = module.default({
+    const vDomNode = component({
       ...props,
-      _inject: {
-        externalStyles,
-        fa: fontAwesome
-      }
+      _inject: injectables
     })
 
     if (vDomNode) {
