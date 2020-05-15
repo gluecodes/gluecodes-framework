@@ -1,6 +1,6 @@
-# @gluecodes/framework
+# @gluecodes/framework (Beta)
 
-Non-trivial framework based on trivial principles. 
+Non-trivial framework based on trivial principles.
 
 Read more about [GlueCodes Platform](https://www.glue.codes)
 
@@ -24,15 +24,26 @@ Read more about [GlueCodes Platform](https://www.glue.codes)
 - Have UI split into layout and sections where only the latter have access to the store and Commands (Layout and Slots).
 - Have Providers which can feed UI with live data.
 
+## Installation
+
+Run:
+```bash
+yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.8.tar.gz
+```
+Or:
+```bash
+npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.8.tar.gz
+```
+
 ## Usage
 
 Explore [TodoMVC app](https://github.com/gluecodes/gluecodes-todomvc) to get an idea of how the framework may be used.
 
 ## App state flow
 
-1. App bootstraps.
-2. Providers are triggered, each writes to the store their returned values and passes it through (result of `getTodos` is passed to `getFilteredTodos`).
-3. Last Provider in the pipeline (`getFilteredTodos`) stores its result and triggers rendering .
+1. The app is bootstraping.
+2. Providers are triggered piping through the store. Each of them writes to the store by resolving or returning. (result of `getTodos` is passed to `getFilteredTodos`).
+3. Last Provider in the pipeline (`getFilteredTodos`) stores its result and triggers rendering.
 4. Rendering layer passes the store as `actionResults` and Commands as `actions`.
 5. User types in a filter string which triggers a Command (`filterTodos`).
 6. Command: `filterTodos` writes to the store and triggers rendering.
