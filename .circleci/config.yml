@@ -8,7 +8,6 @@ jobs:
 
     steps:
       - checkout
-      # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
@@ -19,11 +18,11 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: npm run build
       - run:
-          name: test
-          command: npm test
-      - run:
           name: lint
           command: npm run lint
+      - run:
+          name: test
+          command: npm test
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
