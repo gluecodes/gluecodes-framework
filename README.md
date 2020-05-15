@@ -1,6 +1,8 @@
 # @gluecodes/framework
 
-Non-trivial framework based on trivial principles.
+Non-trivial framework based on trivial principles. 
+
+Read more about [GlueCodes Platform](https://www.glue.codes)
 
 ## Goals
 
