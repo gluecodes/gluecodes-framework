@@ -36,7 +36,7 @@ Explore [TodoMVC app](https://github.com/gluecodes/gluecodes-todomvc) to get an 
 6. Command: `filterTodos` writes to the store and triggers rendering.
 7. Core Command: `reload` re-triggers whole cycle.
 
-![alt text](https://github.com/gluecoodes/gluecodes-framework/raw/master/framework.png "Schema")
+![alt text](https://github.com/gluecodes/gluecodes-framework/blob/master/framework.png "Schema")
 
 ## Contributing
 
