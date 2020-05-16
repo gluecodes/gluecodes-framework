@@ -56,7 +56,7 @@ jobs:
           command: node ~/gluecodes-framework/scripts/packComponents.js
       - run:
           name: push new versions of components and versions.json backup
-          command: aws s3 cp ~/gluecodes-framework/dist/packages/ s3://gluecodes-components/ --acl public-read --recursive --exclude '*' --include '*.tar.gz'
+          command: aws s3 cp ~/gluecodes-framework/dist/packages/ s3://gluecodes-components/ --acl public-read --recursive --exclude '*' --include '*.tar.gz' --include '**/index.js' --include '**/styles.css'
       - run:
           name: push updated versions.json
           command: aws s3 cp ~/gluecodes-framework/versions.json s3://gluecodes-components/versions.json --acl public-read
