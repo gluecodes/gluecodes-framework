@@ -120,7 +120,11 @@ export default dependencies => async ({
   actionResults.route = global.window.location
   actionResults.parseRootNodeDataset = { ...rootNode.dataset }
   vDomState.rootNode = rootNode
-  vDomState.vDomTree = parser(rootNode)
+
+  if (!vDomState.vDomTree) {
+    vDomState.vDomTree = parser(rootNode)
+  }
+
   await runProviders()
   mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
 
