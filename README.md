@@ -57,9 +57,9 @@ Feel free to rise issues, open PRs or contact at hello@glue.codes about any idea
 
 ### Prerequisites
 
-Docker
+- Docker
 
-### Steps
+### Installation
 
 - Run:
 ```bash  
@@ -70,7 +70,7 @@ cp .env_template .env
 docker-compose up 
 ```
 
-## Scripts
+### Scripts
 
 Build:
 ```bash 
@@ -89,6 +89,12 @@ WIP
 ## Documentation
 
 WIP
+
+## Collaborators
+
+- [Chris Czopp](https://github.com/chris-czopp)
+- [Przemyslaw Michalak](https://github.com/w-eagle)
+- [Sam House](https://github.com/house92)
 
 ## License
 
