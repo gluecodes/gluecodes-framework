@@ -28,11 +28,11 @@ Read more about [GlueCodes Platform](https://www.glue.codes)
 
 Run:
 ```bash
-yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.10.tar.gz
+yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.11.tar.gz
 ```
 Or:
 ```bash
-npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.10.tar.gz
+npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.11.tar.gz
 ```
 
 ## Usage
@@ -74,17 +74,18 @@ docker-compose up
 
 Build:
 ```bash 
-docker exec -it gluecodes_todomvc npm run build
+docker exec -it gluecodes_framework npm run build
+ ```
+ 
+Test (remember to run Build script before):
+ ```bash 
+ docker exec -it gluecodes_framework npm run test
  ```
 
 Lint:
 ```bash  
-docker exec -it gluecodes_todomvc npm run lint
+docker exec -it gluecodes_framework npm run lint
 ```
-
-## Tests
-
-WIP
 
 ## Documentation
 
