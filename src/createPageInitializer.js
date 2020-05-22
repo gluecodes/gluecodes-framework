@@ -43,7 +43,7 @@ export default (setupProps) => {
       throw new TypeError('renderPage must be a function')
     }
 
-    if (!rootNode || /^HTML\w+Element$/.test(rootNode.constructor.name)) {
+    if (!rootNode || !/^HTML\w+Element$/.test(rootNode.constructor.name)) {
       throw new TypeError('rootNode must be an instance of HTML Element')
     }
 
