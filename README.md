@@ -1,10 +1,23 @@
 # @gluecodes/framework (Beta)
 
-Non-trivial framework based on trivial principles.
+There are many brilliant JS frameworks out there. For wtf reason would we build another one? 
+
+We all sometimes lack self-discipline following the framework guidelines.
+It can be due to many reasons; tight deadlines, late night out or whatever the implication of being just a human. Often we're just thrown into someone else's code i.e. his own interpretation of the guidelines.
+
+This framework has been developed as part of something bigger. 
+It is meant to be simple and generic, used within an automated IDE which assists you in following the simple design rules. It lets you start with a static PoC and notifies you (live) what may need to be customized to turn it into valuable product. 
+
+Instead of writing glue code all over again, you'll code only what matters i.e. features. Read more about [GlueCodes Platform](https://www.glue.codes).
+
+*We're running a [Kickstarter](https://www.kickstarter.com/projects/gluecodes/gluecodes-platform) campaign to be able to finish off the IDE and web components. Any pledge is much appreciated.*
 
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/CJ451ccca2M/0.jpg)](http://www.youtube.com/watch?v=CJ451ccca2M)
 
-Read more about [GlueCodes Platform](https://www.glue.codes)
+## Ultimate goals
+
+- To assist a developer in following simple, yet solid rules. 
+- To help a developer deliver the business value sooner.
 
 ## Goals
 
