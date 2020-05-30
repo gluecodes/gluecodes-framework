@@ -1,4 +1,6 @@
-# @gluecodes/framework (Beta)
+<p align="center"><a href="https://www.glue.codes" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/logogithub.png " alt="GlueCodes logo"></a></p>
+
+<h2 align="center">@gluecodes/framework (Beta)</h2>
 
 There are many brilliant JS frameworks out there. For wtf reason would we build another one? 
 
@@ -6,7 +8,7 @@ We all sometimes lack self-discipline following the framework guidelines.
 It can be due to many reasons; tight deadlines, late night out or whatever the implication of being just a human. Often we're just thrown into someone else's code i.e. his own interpretation of the guidelines.
 
 This framework has been developed as part of something bigger. 
-It is meant to be simple and generic, used within an automated IDE which assists you in following the simple design rules. It lets you start with a static PoC and notifies you (live) what may need to be customized to turn it into valuable product. 
+It is meant to be simple and generic, used within an automated IDE which assists you in following the simple design rules. It lets you start with a static proof of concept and notifies you (live) what may need to be customized to turn it into valuable product. 
 
 Instead of writing glue code all over again, you'll code only what matters i.e. features. Read more about [GlueCodes Platform](https://www.glue.codes).
 
@@ -14,13 +16,10 @@ Instead of writing glue code all over again, you'll code only what matters i.e. 
 
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/CJ451ccca2M/0.jpg)](http://www.youtube.com/watch?v=CJ451ccca2M)
 
-## Ultimate goals
-
-- To assist a developer in following simple, yet solid rules. 
-- To help a developer deliver the business value sooner.
-
 ## Goals
 
+- __To assist a developer in following simple, yet solid rules.__ 
+- __To help a developer deliver the business value sooner.__
 - It should allow to develop fast loading websites.
 - It should let us build reactive UIs.
 - It should be minimalistic and simplistic.
@@ -78,11 +77,11 @@ Slots are not Components. Components are pure functions which receive immutable,
 
 Run:
 ```bash
-yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.15.tar.gz
+yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.17.tar.gz
 ```
 Or:
 ```bash
-npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.15.tar.gz
+npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.17.tar.gz
 ```
 
 ## Usage
