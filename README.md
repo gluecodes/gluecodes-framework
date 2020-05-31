@@ -1,20 +1,14 @@
-<p align="center"><a href="https://www.glue.codes" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/logogithub.png " alt="GlueCodes logo"></a></p>
+<p align="center"><a href="https://www.glue.codes" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/logogithub.png" alt="GlueCodes logo"></a></p>
 
 <h2 align="center">@gluecodes/framework (Beta)</h2>
 
 There are many brilliant JS frameworks out there. For wtf reason would we build another one? 
 
-We all sometimes lack self-discipline following the framework guidelines.
-It can be due to many reasons; tight deadlines, late night out or whatever the implication of being just a human. Often we're just thrown into someone else's code i.e. his own interpretation of the guidelines.
+We all sometimes lack self-discipline following the framework guidelines. It can be due to many reasons; tight deadlines, late night out or whatever the implication of being just a human. Often we're just thrown into someone else's code i.e. his own interpretation of the guidelines.
 
-This framework has been developed as part of something bigger. 
-It is meant to be simple and generic, used within an automated IDE which assists you in following the simple design rules. It lets you start with a static proof of concept and notifies you (live) what may need to be customized to turn it into valuable product. 
+This framework has been developed as part of something bigger. It is meant to be simple and generic, used within an automated IDE which assists you in following the simple design rules. It lets you start with a static proof of concept and notifies you (live) what may need to be customized to turn it into valuable product. 
 
 Instead of writing glue code all over again, you'll code only what matters i.e. features. Read more about [GlueCodes Platform](https://www.glue.codes).
-
-*We're running a [Kickstarter](https://www.kickstarter.com/projects/gluecodes/gluecodes-platform) campaign to be able to finish off the IDE and web components. Any pledge is much appreciated.*
-
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/CJ451ccca2M/0.jpg)](http://www.youtube.com/watch?v=CJ451ccca2M)
 
 ## Goals
 
@@ -35,7 +29,15 @@ Instead of writing glue code all over again, you'll code only what matters i.e. 
 - Have UI split into layout and sections where only the latter have access to the store and actions.
 - Have actions which can feed UI with live data.
 
+## Demo
+
+Bear in mind it's a prototype which still requires a lot of work. There a features that don't work or are missing. Also, we are aware of performance improvements which need to take place. Play around with this [demo](http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index) and enjoy the [live preview](http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/previewPage.html?appId=1&pageId=index). 
+
+*These all costs our time and effort, hence we're running a [Kickstarter](https://www.kickstarter.com/projects/gluecodes/gluecodes-platform) campaign. Much :heart: for your backing.*
+
 ## Key concepts
+
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/CJ451ccca2M/0.jpg)](http://www.youtube.com/watch?v=CJ451ccca2M)
 
 ### Vocabulary
 
@@ -77,11 +79,11 @@ Slots are not Components. Components are pure functions which receive immutable,
 
 Run:
 ```bash
-yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.17.tar.gz
+yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.18.tar.gz
 ```
 Or:
 ```bash
-npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.17.tar.gz
+npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.18.tar.gz
 ```
 
 ## Usage
