@@ -31,9 +31,9 @@ Instead of writing glue code all over again, you'll code only what matters i.e. 
 
 ## Demo
 
-Bear in mind it's a prototype which still requires a lot of work. There a features that don't work or are missing. Also, we are aware of performance improvements which need to take place. Play around with this [demo](http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index) and enjoy the [live preview](http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/previewPage.html?appId=1&pageId=index). 
+Bear in mind it's a prototype which still requires a lot of work. Play around with this [demo](http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index) and enjoy the [live preview](http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/previewPage.html?appId=1&pageId=index). 
 
-*These all costs our time and effort, hence we're running a [Kickstarter](https://www.kickstarter.com/projects/gluecodes/gluecodes-platform) campaign. Much :heart: for your backing.*
+*We're running a [Kickstarter](https://www.kickstarter.com/projects/gluecodes/gluecodes-platform) campaign to finish off the IDE and component repository. Back us to keep this project alive :heart:*
 
 ## Key concepts
 
@@ -79,11 +79,11 @@ Slots are not Components. Components are pure functions which receive immutable,
 
 Run:
 ```bash
-yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.18.tar.gz
+yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.19.tar.gz
 ```
 Or:
 ```bash
-npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.18.tar.gz
+npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.19.tar.gz
 ```
 
 ## Usage
