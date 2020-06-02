@@ -2,54 +2,41 @@
 
 <h2 align="center">@gluecodes/framework (Beta)</h2>
 
-There are many brilliant JS frameworks out there. For wtf reason would we build another one? 
+<p align="center">There are many brilliant JS frameworks out there. For wtf reason would we build another one?</p>
 
-We all sometimes lack self-discipline following the framework guidelines. It can be due to many reasons; tight deadlines, late night out or whatever the implication of being just a human. Often we're just thrown into someone else's code i.e. his own interpretation of the guidelines.
+<p align="center">Because is the first framework built with the IDE in mind</p>
 
-This framework has been developed as part of something bigger. It is meant to be simple and generic, used within an automated IDE which assists you in following the simple design rules. It lets you start with a static proof of concept and notifies you (live) what may need to be customized to turn it into valuable product. 
+<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/ide.jpg" alt="GlueCodes IDE"></p>
 
-Instead of writing glue code all over again, you'll code only what matters i.e. features. Read more about [GlueCodes Platform](https://www.glue.codes).
+<h2 align="center">Demo</h2>
 
-## Goals
+<p align="center">Bear in mind it's a prototype which still requires a lot of work. Play around with this <a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index">demo</a> and enjoy the <a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/previewPage.html?appId=1&pageId=index"> live preview.</a></p>
 
-- __To assist a developer in following simple, yet solid rules.__ 
-- __To help a developer deliver the business value sooner.__
-- It should allow to develop fast loading websites.
-- It should let us build reactive UIs.
-- It should be minimalistic and simplistic.
-- It should let us build apps that scale.
-- It should let us build a boilerplate that can be easily generated with common tools.
+<p align="center"><a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/liveDemo.gif" alt="GlueCodes live demo"></a></p>
 
-## Dev experience
+<h2 align="center">Goals</h2>
 
-- Build UI from pure functions which return an instance of Virtual DOM.
-- Have a central store which keeps results of all actions.
-- Stop worrying about naming data and access data via action names.
-- Keep actions pure.
-- Have UI split into layout and sections where only the latter have access to the store and actions.
-- Have actions which can feed UI with live data.
+<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/goldenGoals.gif" alt="Golden Goals"></p>
 
-## Demo
+<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/silverGoals.gif" alt="Silver Goals"></p>
 
-Bear in mind it's a prototype which still requires a lot of work. Play around with this [demo](http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index) and enjoy the [live preview](http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/previewPage.html?appId=1&pageId=index). 
+<h2 align="center">Dev experience</h2>
 
-*We're running a [Kickstarter](https://www.kickstarter.com/projects/gluecodes/gluecodes-platform) campaign to finish off the IDE and component repository. Back us to keep this project alive :heart:*
+<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/experience.png" alt="Dev Experience"></p>
 
-## Key concepts
+<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/dictionary.png" alt="Vocabulary"></p>
 
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/CJ451ccca2M/0.jpg)](http://www.youtube.com/watch?v=CJ451ccca2M)
+<h2 align="center">Vocabulary</h2>
 
-### Vocabulary
+- __command__ - an action triggered by a user e.g. via DOM event
+- __component__ - a pure function which returns an instance of Virtual DOM and can be reused across multiple projects
+- __layout__ - a function which the only role is to lay down slots, hence it does not have access to the store, nor commands
+- __provider__ - an action executed prior rendering which provide initial data and make those actions pipe the store through
+- __reusable slot__ - a piece of UI to be reused across pages within an app which has read access to the store and, may trigger commands
+- __slot__ - a logically separated UI section which have read access to the store and, may trigger commands
+- __store__ - a central app state
 
-- command - an action triggered by a user e.g. via DOM event
-- component - a pure function which returns an instance of Virtual DOM and can be reused across multiple projects
-- layout - a function which the only role is to lay down slots, hence it does not have access to the store, nor commands
-- provider - an action executed prior rendering which provide initial data and make those actions pipe the store through
-- reusable slot - a piece of UI to be reused across pages within an app which has read access to the store and, may trigger commands
-- slot - a logically separated UI section which have read access to the store and, may trigger commands
-- store - a central app state
-
-### App state flow
+<h2 align="center">App state flow</h2>
 
 There is a uni-directional app state flow which populates a single store. See example below.
 
@@ -63,7 +50,9 @@ There is a uni-directional app state flow which populates a single store. See ex
 
 ![alt text](https://github.com/gluecodes/gluecodes-framework/blob/master/framework.png "Schema")
 
-### Rendering
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/CJ451ccca2M/0.jpg)](http://www.youtube.com/watch?v=CJ451ccca2M)
+
+<h2 align="center">Rendering</h2>
 
 Every time a Command is triggered, Virtual DOM performs full-page re-render to give all Slots read access to the Command result via Store.
  
@@ -71,11 +60,11 @@ There is a core 'reload' Command to re-trigger Providers and then perform re-ren
 It's meant to be called right after the Command handling particular app event resolved (usually it happens in DOM event handler).
 Since Providers pipe through the store, after 'reload', they may access result of the Command.  
 
-### Components
+<h2 align="center">Components</h2>
 
 Slots are not Components. Components are pure functions which receive immutable, non-app specific props.
 
-## Installation
+<h2 align="center">Installation</h2>
 
 Run:
 ```bash
@@ -86,11 +75,12 @@ Or:
 npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.19.tar.gz
 ```
 
-## Usage
+<h2 align="center">Usage</h2>
 
 Explore [TodoMVC app](https://github.com/gluecodes/gluecodes-todomvc) to get an idea of how the framework may be used.
 
-## Contributing
+
+<h2 align="center">Contributing</h2>
 
 Feel free to rise issues, open PRs or contact at hello@glue.codes about any ideas/criticism.
 
@@ -132,8 +122,8 @@ WIP
 
 ## Collaborators
 
-- [Chris Czopp](https://github.com/chris-czopp)
-- [Przemyslaw Michalak](https://github.com/w-eagle)
+- [Chris Czopp](https://github.com/chris-czopp) <a href="https://twitter.com/ChrisCzopp?ref_src=twsrc%5Etfw" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/follow.png" alt="Chris follow Twitter"></a>
+- [Przemyslaw Michalak](https://github.com/w-eagle) <a href="https://twitter.com/PrzemyslawMic10?ref_src=twsrc%5Etfw" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/follow.png" alt="Przemek follow Twitter"></a>
 - [Sam House](https://github.com/house92)
 
 ## License
