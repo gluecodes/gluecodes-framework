@@ -4,25 +4,25 @@
 
 <p align="center">There are many brilliant JS frameworks out there. For wtf reason would we build another one?</p>
 
-<p align="center">Because is the first framework built with the IDE in mind</p>
+<p align="center">Because it is the first framework built with the IDE in mind</p>
 
-<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/ide.jpg" alt="GlueCodes IDE"></p>
+<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/ide.jpg" alt="GlueCodes IDE"></p>
 
 <h2 align="center">Demo</h2>
 
 <p align="center">Bear in mind it's a prototype which still requires a lot of work. Play around with this <a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index">demo</a> and enjoy the <a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/previewPage.html?appId=1&pageId=index"> live preview.</a></p>
 
-<p align="center"><a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/liveDemo.gif" alt="GlueCodes live demo"></a></p>
+<p align="center"><a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index" target="_blank" rel="noopener noreferrer"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/liveDemo.gif" alt="GlueCodes live demo"></a></p>
 
 <h2 align="center">Goals</h2>
 
-<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/goldenGoals.gif" alt="Golden Goals"></p>
+<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/goldenGoals.gif" alt="Golden Goals"></p>
 
-<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/silverGoals.gif" alt="Silver Goals"></p>
+<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/silverGoals.gif" alt="Silver Goals"></p>
 
 <h2 align="center">Dev experience</h2>
 
-<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/experience.png" alt="Dev Experience"></p>
+<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/experience.png" alt="Dev Experience"></p>
 
 <p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/dictionary.png" alt="Vocabulary"></p>
 
@@ -50,7 +50,7 @@ There is a uni-directional app state flow which populates a single store. See ex
 
 ![alt text](https://github.com/gluecodes/gluecodes-framework/blob/master/framework.png "Schema")
 
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/CJ451ccca2M/0.jpg)](http://www.youtube.com/watch?v=CJ451ccca2M)
+<p align="center"><a href="http://www.youtube.com/watch?v=CJ451ccca2M"><img alt="Schema" src="http://img.youtube.com/vi/CJ451ccca2M/0.jpg"/></a></p>
 
 <h2 align="center">Rendering</h2>
 
@@ -68,11 +68,11 @@ Slots are not Components. Components are pure functions which receive immutable,
 
 Run:
 ```bash
-yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.19.tar.gz
+yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.20.tar.gz
 ```
 Or:
 ```bash
-npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.19.tar.gz
+npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-3.0.20.tar.gz
 ```
 
 <h2 align="center">Usage</h2>
@@ -122,8 +122,8 @@ WIP
 
 ## Collaborators
 
-- [Chris Czopp](https://github.com/chris-czopp) <a href="https://twitter.com/ChrisCzopp?ref_src=twsrc%5Etfw" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/follow.png" alt="Chris follow Twitter"></a>
-- [Przemyslaw Michalak](https://github.com/w-eagle) <a href="https://twitter.com/PrzemyslawMic10?ref_src=twsrc%5Etfw" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/follow.png" alt="Przemek follow Twitter"></a>
+- [Chris Czopp](https://github.com/chris-czopp) <a href="https://twitter.com/ChrisCzopp?ref_src=twsrc%5Etfw" target="_blank" rel="noopener noreferrer"><img width="50" src="https://github.com/gluecodes/gluecodes-framework/blob/master/follow.png" alt="Chris follow Twitter"></a>
+- [Przemyslaw Michalak](https://github.com/w-eagle) <a href="https://twitter.com/PrzemyslawMic10?ref_src=twsrc%5Etfw" target="_blank" rel="noopener noreferrer"><img width="50" src="https://github.com/gluecodes/gluecodes-framework/blob/master/follow.png" alt="Przemek follow Twitter"></a>
 - [Sam House](https://github.com/house92)
 
 ## License
