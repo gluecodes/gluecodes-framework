@@ -1,4 +1,4 @@
-<p align="center"><a href="https://www.glue.codes" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/logogithub.png" alt="GlueCodes logo"></a></p>
+<p align="center"><a href="https://www.glue.codes" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/logogithub.png" alt="GlueCodes logo"></a></p>
 
 <h2 align="center">@gluecodes/framework (Beta)</h2>
 
@@ -6,25 +6,25 @@
 
 <p align="center">Because it is the first framework built with the IDE in mind</p>
 
-<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/ide.jpg" alt="GlueCodes IDE"></p>
+<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/ide.jpg" alt="GlueCodes IDE"></p>
 
 <h2 align="center">Demo</h2>
 
 <p align="center">Bear in mind it's a prototype which still requires a lot of work. Play around with this <a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index">demo</a> and enjoy the <a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/previewPage.html?appId=1&pageId=index"> live preview.</a></p>
 
-<p align="center"><a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index" target="_blank" rel="noopener noreferrer"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/liveDemo.gif" alt="GlueCodes live demo"></a></p>
+<p align="center"><a href="http://gluecodes-demo.s3-website.eu-west-2.amazonaws.com/ide.html?appId=1&edit=page&id=index" target="_blank" rel="noopener noreferrer"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/liveDemo.gif" alt="GlueCodes live demo"></a></p>
 
 <h2 align="center">Goals</h2>
 
-<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/goldenGoals.gif" alt="Golden Goals"></p>
+<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/goldenGoals.gif" alt="Golden Goals"></p>
 
-<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/silverGoals.gif" alt="Silver Goals"></p>
+<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/silverGoals.gif" alt="Silver Goals"></p>
 
 <h2 align="center">Dev experience</h2>
 
-<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/experience.png" alt="Dev Experience"></p>
+<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/experience.png" alt="Dev Experience"></p>
 
-<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/dictionary.png" alt="Vocabulary"></p>
+<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/dictionary.png" alt="Vocabulary"></p>
 
 <h2 align="center">Vocabulary</h2>
 
