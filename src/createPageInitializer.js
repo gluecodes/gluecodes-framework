@@ -126,6 +126,7 @@ export default (setupProps) => {
           mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
           return actionResults[commandName]
         } catch (err) {
+          console.error(err)
           handleError(err)
         }
       }
@@ -134,7 +135,7 @@ export default (setupProps) => {
       actionResults[providerName] = data
       mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
     }
-
+    const initializedLiveProviders = []
     const runProviders = async () => {
       for (const providerName of providers) {
         const providerBeingExecuted = setupProps.providers[providerName](actionResults)
@@ -142,13 +143,18 @@ export default (setupProps) => {
         if (providerBeingExecuted instanceof Promise) {
           actionResults[providerName] = await providerBeingExecuted
         } else if (typeof providerBeingExecuted === 'function') {
-          providerBeingExecuted(data => incomingDataProvided(providerName, data))
+          providerBeingExecuted({
+            hasBeenInitialized: initializedLiveProviders.includes(providerName),
+            provide: data => incomingDataProvided(providerName, data)
+          })
+          initializedLiveProviders.push(providerName)
         } else {
           actionResults[providerName] = providerBeingExecuted
         }
       }
     }
 
+    actionResults.rerender = () => mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
     actionResults.fail = handleError
     actionResults.route = global.window.location
     actionResults.parseRootNodeDataset = { ...rootNode.dataset }

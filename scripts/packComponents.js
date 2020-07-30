@@ -11,7 +11,7 @@ const {
 const path = require('path')
 
 const componentName = 'framework'
-const versionsFilePath = path.resolve(__dirname, '../versions.json')
+const versionsFilePath = path.resolve(__dirname, '../libVersions.json')
 const componentsToPackPath = path.resolve(__dirname, '../dist/packages')
 const doesVersionsFileExist = existsSync(versionsFilePath)
 
@@ -80,7 +80,7 @@ gitLogCommand.stdout.on('end', () => {
       console.error(data.toString())
     })
 
-  if (doesVersionsFileExist) { // create versions.json backup
+  if (doesVersionsFileExist) { // create versions backup
     const backedVersionsDirName = `versions-${(new Date().getTime())}`
     const versionsBackupFilePath = path.resolve(__dirname, `../dist/packages/${backedVersionsDirName}`)
 
@@ -92,7 +92,7 @@ gitLogCommand.stdout.on('end', () => {
       })
   }
 
-  writeFileSync(versionsFilePath, JSON.stringify(versions, undefined, 2)) // update versions.json
+  writeFileSync(versionsFilePath, JSON.stringify(versions, undefined, 2)) // update versions
 })
 
 gitLogCommand.stderr.on('data', (data) => {
