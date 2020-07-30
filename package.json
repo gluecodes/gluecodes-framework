@@ -1,6 +1,6 @@
 {
   "name": "@gluecodes/framework",
-  "version": "3.0.15",
+  "version": "3.0.24",
   "description": "",
   "main": "dist/main.bundle.js",
   "browser": "dist/main.bundle.js",
