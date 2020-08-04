@@ -71,6 +71,20 @@ export default (setupProps) => {
       reload: async () => {
         await runProviders()
         mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+      },
+      runTogether: async (commandsToRun) => {
+        for (const command of commandsToRun) {
+          const [commandName, ...args] = command
+          const commandBeingExecuted = setupProps.commands[commandName](...args)
+
+          if (commandBeingExecuted instanceof Promise) {
+            actionResults[commandName] = await commandBeingExecuted.catch(handleError)
+          } else {
+            actionResults[commandName] = commandBeingExecuted
+          }
+        }
+
+        mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
       }
     }
     const createSlotRenderer = (commandBeingExecuted = null) => ({ id }) => {
@@ -107,30 +121,32 @@ export default (setupProps) => {
 
       mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
     }
-    const boundCommands = Object.keys(allCommands).reduce((acc, commandName) => ({
-      ...acc,
-      [commandName]: (...args) => {
-        try {
-          const commandBeingExecuted = allCommands[commandName](...args)
+    const boundCommands = Object.keys(allCommands).reduce((acc, commandName) => (
+      !['redirect', 'reload', 'runTogether'].includes(commandName) ? {
+        ...acc,
+        [commandName]: (...args) => {
+          try {
+            const commandBeingExecuted = allCommands[commandName](...args)
 
-          if (commandBeingExecuted instanceof Promise) {
-            mountPage(renderPage({ actionResults, getSlot: createSlotRenderer(commandName) }))
-            return commandBeingExecuted
-              .then((result) => {
-                actionResults[commandName] = result
-                mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
-              })
-              .catch(handleError)
+            if (commandBeingExecuted instanceof Promise) {
+              mountPage(renderPage({ actionResults, getSlot: createSlotRenderer(commandName) }))
+              return commandBeingExecuted
+                .then((result) => {
+                  actionResults[commandName] = result
+                  mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+                })
+                .catch(handleError)
+            }
+            actionResults[commandName] = commandBeingExecuted
+            mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+            return actionResults[commandName]
+          } catch (err) {
+            console.error(err)
+            handleError(err)
           }
-          actionResults[commandName] = commandBeingExecuted
-          mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
-          return actionResults[commandName]
-        } catch (err) {
-          console.error(err)
-          handleError(err)
         }
-      }
-    }), allCommands)
+      } : acc
+    ), allCommands)
     const incomingDataProvided = (providerName, data) => {
       actionResults[providerName] = data
       mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
