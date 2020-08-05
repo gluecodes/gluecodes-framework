@@ -52,6 +52,28 @@ export default (setupProps) => {
     }
 
     const actionResults = { ...setupProps.store, errors: {} }
+    const handleError = (error) => {
+      if (!actionResults.errors[error.name]) {
+        actionResults.errors[error.name] = error
+      } else {
+        Object.getOwnPropertyNames(error)
+          .reduce((acc, propName) => Object.assign(acc, { [propName]: error[propName] }), actionResults.errors[error.name])
+
+        actionResults.errors[error.name].isCancelled = false
+      }
+
+      actionResults.errors[error.name].throwCount = actionResults.errors[error.name].throwCount || 0
+      actionResults.errors[error.name].throwCount += 1
+
+      if (error.due) {
+        Object.assign(
+          actionResults.errors,
+          error.due.reduce((acc, error) => ({ ...acc, [error.name]: error }), {})
+        )
+      }
+
+      mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+    }
     const allCommands = {
       ...setupProps.commands,
       cancelError: ({ errorName }) => {
@@ -75,7 +97,7 @@ export default (setupProps) => {
       runTogether: async (commandsToRun) => {
         for (const command of commandsToRun) {
           const [commandName, ...args] = command
-          const commandBeingExecuted = setupProps.commands[commandName](...args)
+          const commandBeingExecuted = allCommands[commandName](...args)
 
           if (commandBeingExecuted instanceof Promise) {
             actionResults[commandName] = await commandBeingExecuted.catch(handleError)
@@ -85,7 +107,8 @@ export default (setupProps) => {
         }
 
         mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
-      }
+      },
+      fail: handleError
     }
     const createSlotRenderer = (commandBeingExecuted = null) => ({ id }) => {
       if (slots[id]) {
@@ -99,30 +122,8 @@ export default (setupProps) => {
 
       return () => null
     }
-    const handleError = (error) => {
-      if (!actionResults.errors[error.name]) {
-        actionResults.errors[error.name] = error
-      } else {
-        Object.getOwnPropertyNames(error)
-          .reduce((acc, propName) => Object.assign(acc, { [propName]: error[propName] }), actionResults.errors[error.name])
-
-        actionResults.errors[error.name].isCancelled = false
-      }
-
-      actionResults.errors[error.name].throwCount = actionResults.errors[error.name].throwCount || 0
-      actionResults.errors[error.name].throwCount += 1
-
-      if (error.due) {
-        Object.assign(
-          actionResults.errors,
-          error.due.reduce((acc, error) => ({ ...acc, [error.name]: error }), {})
-        )
-      }
-
-      mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
-    }
     const boundCommands = Object.keys(allCommands).reduce((acc, commandName) => (
-      !['redirect', 'reload', 'runTogether'].includes(commandName) ? {
+      !['fail', 'redirect', 'reload', 'runTogether'].includes(commandName) ? {
         ...acc,
         [commandName]: (...args) => {
           try {
