@@ -49,8 +49,11 @@ gitLogCommand.stdout.on('end', () => {
   if (doesVersionsFileExist) {
     if (mergeType === 'major') {
       version.major += 1
+      version.minor = 0
+      version.patch = 0
     } else if (mergeType === 'minor') {
       version.minor += 1
+      version.patch = 0
     } else if (mergeType === 'patch') {
       version.patch += 1
     }
