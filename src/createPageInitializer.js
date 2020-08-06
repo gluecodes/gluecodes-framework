@@ -150,9 +150,10 @@ export default (setupProps) => {
     ), allCommands)
     const incomingDataProvided = (providerName, data) => {
       actionResults[providerName] = data
+      liveProviderPromises.priv[providerName].resolve(data)
       mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
     }
-    const initializedLiveProviders = []
+    const liveProviderPromises = { priv: {}, pub: {} }
     const runProviders = async () => {
       for (const providerName of providers) {
         const providerBeingExecuted = setupProps.providers[providerName](actionResults)
@@ -160,11 +161,17 @@ export default (setupProps) => {
         if (providerBeingExecuted instanceof Promise) {
           actionResults[providerName] = await providerBeingExecuted
         } else if (typeof providerBeingExecuted === 'function') {
+          liveProviderPromises.pub[providerName] = new Promise((resolve, reject) => {
+            setTimeout(() => {
+              reject(new Error(`Provider: '${providerName}' didn't resolve within 20s, make sure all its preceding providers exist in the provider pipeline`))
+            }, 20000)
+            liveProviderPromises.priv[providerName] = { resolve }
+          })
           providerBeingExecuted({
-            hasBeenInitialized: initializedLiveProviders.includes(providerName),
+            asyncResults: liveProviderPromises.pub,
+            hasBeenInitialized: !!liveProviderPromises.pub[providerName],
             provide: data => incomingDataProvided(providerName, data)
           })
-          initializedLiveProviders.push(providerName)
         } else {
           actionResults[providerName] = providerBeingExecuted
         }
