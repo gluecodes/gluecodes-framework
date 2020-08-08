@@ -154,6 +154,7 @@ export default (setupProps) => {
       mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
     }
     const liveProviderPromises = { priv: {}, pub: {} }
+    const initializedLiveProviders = []
     const runProviders = async () => {
       for (const providerName of providers) {
         const providerBeingExecuted = setupProps.providers[providerName](actionResults)
@@ -169,9 +170,10 @@ export default (setupProps) => {
           })
           providerBeingExecuted({
             asyncResults: liveProviderPromises.pub,
-            hasBeenInitialized: !!liveProviderPromises.pub[providerName],
+            hasBeenInitialized: initializedLiveProviders.includes(providerName),
             provide: data => incomingDataProvided(providerName, data)
           })
+          initializedLiveProviders.push(providerName)
         } else {
           actionResults[providerName] = providerBeingExecuted
         }
