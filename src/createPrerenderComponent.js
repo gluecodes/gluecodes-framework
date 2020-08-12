@@ -13,7 +13,7 @@ export default () => (
 
   for (const className of Object.keys(componentClassMap)) {
     if (!module.customizableClasses.includes(className)) {
-      throw new TypeError(`Class .${className} of ${scopeName}-${roleName}.component.css isn't declared as customizable`)
+      throw new TypeError(`Class .${className} of ${componentId}.component.css isn't declared as customizable`)
     }
 
     externalStyles[className] = [
