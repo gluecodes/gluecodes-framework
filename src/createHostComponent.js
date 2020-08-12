@@ -1,19 +1,24 @@
 export default ({
-  bootstrap,
-  fontAwesome,
   renderer
-}) => (module, { styles, registry, roleName, scopeName }) => {
-  const externalStyles = { ...bootstrap }
+}) => (
+  module,
+  {
+    componentId,
+    getExternalStyles,
+    styles
+  }
+) => {
+  const { fa, others } = getExternalStyles()
+  const externalStyles = others
   const componentClassMap = styles
   const injectables = {
     externalStyles,
-    fa: fontAwesome
+    fa
   }
-  let component
 
   for (const className of Object.keys(componentClassMap)) {
     if (!module.customizableClasses.includes(className)) {
-      throw new TypeError(`Class .${className} of ${scopeName}-${roleName}.component.css isn't declared as customizable`)
+      throw new TypeError(`Class .${className} of ${componentId}.component.css isn't declared as customizable`)
     }
 
     externalStyles[className] = [
@@ -42,22 +47,28 @@ export default ({
     global.document.head.appendChild(fontFaceNode)
   })
 
-  if (registry) {
-    component = module.default(Object.assign(registry, {
-      _inject: injectables
-    }))
-  } else {
-    component = module.default
-  }
-
   return (props) => {
-    const vDomNode = component({
+    const vDomNode = module.default({
       ...props,
       _inject: injectables
     })
 
+    if (typeof vDomNode === 'function' && vDomNode.constructor.name !== 'VirtualNode') {
+      const thunkComponent = vDomNode
+
+      return (...args) => {
+        const vDomNode = thunkComponent(...args)
+
+        if (vDomNode) {
+          vDomNode.properties.className = `${vDomNode.properties.className || ''} gc-role-${componentId}`.trim()
+        }
+
+        return vDomNode
+      }
+    }
+
     if (vDomNode) {
-      vDomNode.properties.className = `${vDomNode.properties.className || ''} gc-role-${scopeName}-${roleName}`.trim()
+      vDomNode.properties.className = `${vDomNode.properties.className || ''} gc-role-${componentId}`.trim()
     }
 
     return vDomNode
