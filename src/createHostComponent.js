@@ -1,4 +1,5 @@
 export default ({
+  glueDomRenderer,
   renderer
 }) => (
   module,
@@ -28,6 +29,7 @@ export default ({
   }
 
   module.setRenderer(renderer)
+  module.setGlueDomRenderer(glueDomRenderer)
 
   // import fonts
   module.googleFonts.forEach((font) => {
