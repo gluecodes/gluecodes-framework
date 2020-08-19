@@ -74,8 +74,7 @@ export default (setupProps) => {
 
       mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
     }
-    const allCommands = {
-      ...setupProps.commands,
+    const nativeCommands = {
       cancelError: ({ errorName }) => {
         if (actionResults.errors[errorName]) {
           actionResults.errors[errorName].isCancelled = true
@@ -86,6 +85,8 @@ export default (setupProps) => {
             })
           }
         }
+
+        mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
       },
       redirect (path) {
         global.window.location = `${global.window.location.origin}/${path}`
@@ -95,20 +96,28 @@ export default (setupProps) => {
         mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
       },
       runTogether: async (commandsToRun) => {
-        for (const command of commandsToRun) {
-          const [commandName, ...args] = command
-          const commandBeingExecuted = allCommands[commandName](...args)
+        try {
+          for (const command of commandsToRun) {
+            const [commandName, ...args] = command
+            const commandBeingExecuted = allCommands[commandName](...args)
 
-          if (commandBeingExecuted instanceof Promise) {
-            actionResults[commandName] = await commandBeingExecuted.catch(handleError)
-          } else {
-            actionResults[commandName] = commandBeingExecuted
+            if (commandBeingExecuted instanceof Promise) {
+              actionResults[commandName] = await commandBeingExecuted
+            } else {
+              actionResults[commandName] = commandBeingExecuted
+            }
           }
-        }
 
-        mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+          mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+        } catch (err) {
+          handleError(err)
+        }
       },
       fail: handleError
+    }
+    const allCommands = {
+      ...setupProps.commands,
+      ...nativeCommands
     }
     const createSlotRenderer = (commandBeingExecuted = null) => ({ id }) => {
       if (slots[id]) {
@@ -122,32 +131,29 @@ export default (setupProps) => {
 
       return () => null
     }
-    const boundCommands = Object.keys(allCommands).reduce((acc, commandName) => (
-      !['fail', 'redirect', 'reload', 'runTogether'].includes(commandName) ? {
-        ...acc,
-        [commandName]: (...args) => {
-          try {
-            const commandBeingExecuted = allCommands[commandName](...args)
+    const boundCommands = Object.keys(setupProps.commands).reduce((acc, commandName) => ({
+      ...acc,
+      [commandName]: (...args) => {
+        try {
+          const commandBeingExecuted = allCommands[commandName](...args)
 
-            if (commandBeingExecuted instanceof Promise) {
-              mountPage(renderPage({ actionResults, getSlot: createSlotRenderer(commandName) }))
-              return commandBeingExecuted
-                .then((result) => {
-                  actionResults[commandName] = result
-                  mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
-                })
-                .catch(handleError)
-            }
-            actionResults[commandName] = commandBeingExecuted
-            mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
-            return actionResults[commandName]
-          } catch (err) {
-            console.error(err)
-            handleError(err)
+          if (commandBeingExecuted instanceof Promise) {
+            mountPage(renderPage({ actionResults, getSlot: createSlotRenderer(commandName) }))
+            return commandBeingExecuted
+              .then((result) => {
+                actionResults[commandName] = result
+                mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+              })
+              .catch(handleError)
           }
+          actionResults[commandName] = commandBeingExecuted
+          mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+          return actionResults[commandName]
+        } catch (err) {
+          handleError(err)
         }
-      } : acc
-    ), allCommands)
+      }
+    }), { ...nativeCommands })
     const incomingDataProvided = (providerName, data) => {
       actionResults[providerName] = data
       liveProviderPromises.priv[providerName].resolve(data)
