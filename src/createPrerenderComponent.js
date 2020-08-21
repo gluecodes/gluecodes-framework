@@ -24,6 +24,8 @@ export default ({
     ].join(' ')
   }
 
+  module.setGlueDomPrerenderer(glueDomPrerenderer)
+
   const html = module.prerender({
     ...props,
     _inject: {
@@ -33,8 +35,6 @@ export default ({
   }).trim()
 
   let scopedHtml = html.replace(/^(<[^<>]+)(class="[^"]*)/, `$1$2 gc-role-${componentId}`)
-
-  module.setGlueDomPrerenderer(glueDomPrerenderer)
 
   if (scopedHtml === html) {
     scopedHtml = html.replace(/^(<[^<>]+)/, `$1 class="gc-role-${componentId}"`)
