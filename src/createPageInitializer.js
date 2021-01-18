@@ -75,7 +75,7 @@ export default (setupProps) => {
       mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
     }
     const nativeCommands = {
-      cancelError: ({ errorName }) => {
+      cancelError: ({ errorName, shouldRerender = true }) => {
         if (actionResults.errors[errorName]) {
           actionResults.errors[errorName].isCancelled = true
 
@@ -86,7 +86,9 @@ export default (setupProps) => {
           }
         }
 
-        mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+        if (shouldRerender) {
+          mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+        }
       },
       redirect (path) {
         global.window.location = `${global.window.location.origin}/${path}`
@@ -95,6 +97,7 @@ export default (setupProps) => {
         await runProviders()
         mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
       },
+      rerender: () => mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() })),
       runTogether: async (commandsToRun) => {
         try {
           for (const command of commandsToRun) {
@@ -186,8 +189,7 @@ export default (setupProps) => {
       }
     }
 
-    actionResults.rerender = () => mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
-    actionResults.fail = handleError
+    actionResults.getNativeCommands = nativeCommands
     actionResults.route = global.window.location
     actionResults.parseRootNodeDataset = { ...rootNode.dataset }
     vDomState.rootNode = rootNode
