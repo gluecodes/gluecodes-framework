@@ -62,11 +62,11 @@ Slots are not Components. Components are pure functions which receive immutable,
 
 Run:
 ```bash
-yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-4.5.3.tar.gz
+yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-4.6.0.tar.gz
 ```
 Or:
 ```bash
-npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-4.5.3.tar.gz
+npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-4.6.0.tar.gz
 ```
 
 <h2 align="center">Usage</h2>
