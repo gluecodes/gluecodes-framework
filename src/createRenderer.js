@@ -23,14 +23,28 @@ const onceDomNodeVisited = (handler) => {
   return new Hook()
 }
 
-const rewriteProps = (props) => Object.keys(props || {}).reduce((acc, propName) => ({
+const rewriteProps = (tagName, props) => Object.keys(props || {}).reduce((acc, propName) => ({
   ...acc,
   ...(propName === 'gc-onDomNodeConnected'
     ? { 'gc-onDomNodeConnected': onDomNodeConnected(props[propName]) }
     : {}),
   ...(propName === 'gc-onceDomNodeVisited'
     ? { 'gc-onceDomNodeVisited': onceDomNodeVisited(props[propName]) }
-    : {})
+    : {}),
+  ...(tagName === 'source' && propName === 'src'
+    ? {
+      'gc-onDomNodeConnected': onDomNodeConnected((node) => {
+        if (/^blob:/.test(node.src)) {
+          node.parentNode.load()
+        }
+      })
+    } : {})
 }), props)
 
-export default () => (tagName, props, ...args) => h(tagName, rewriteProps(props), args)
+export default () => (tagName, props, ...children) => {
+  if (props.attributes && props.attributes['gc-as'] === 'widget') {
+    return children
+  }
+
+  return h(tagName, rewriteProps(tagName, props), children)
+}
