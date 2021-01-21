@@ -42,7 +42,7 @@ const rewriteProps = (tagName, props) => Object.keys(props || {}).reduce((acc, p
 }), props)
 
 export default () => (tagName, props, ...children) => {
-  if (props.attributes && props.attributes['gc-as'] === 'widget') {
+  if (props && props.attributes && props.attributes['gc-as'] === 'widget') {
     return children
   }
 
