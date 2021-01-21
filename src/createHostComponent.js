@@ -50,7 +50,7 @@ export default ({
   })
 
   return (props) => {
-    const vDomNode = module.default({
+    const vDomNode = module.render({
       ...props,
       _inject: injectables
     })
@@ -67,6 +67,14 @@ export default ({
 
         return vDomNode
       }
+    }
+
+    if (Array.isArray(vDomNode)) {
+      vDomNode.forEach((node) => {
+        node.properties.className = `${node.properties.className || ''} gc-role-${componentId}`.trim()
+      })
+
+      return vDomNode
     }
 
     if (vDomNode) {

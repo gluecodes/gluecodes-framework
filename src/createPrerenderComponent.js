@@ -1,5 +1,6 @@
 export default ({
-  glueDomPrerenderer
+  glueDomPrerenderer,
+  prerenderer
 }) => (
   module,
   {
@@ -24,6 +25,7 @@ export default ({
     ].join(' ')
   }
 
+  module.setPrerenderer(prerenderer)
   module.setGlueDomPrerenderer(glueDomPrerenderer)
 
   const html = module.prerender({
