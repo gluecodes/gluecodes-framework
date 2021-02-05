@@ -2,20 +2,21 @@ const path = require('path')
 
 module.exports = {
   entry: {
-    main: './index.js'
+    main: './index.js',
+    test: './test.jsx'
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: { loader: 'babel-loader' }
-      },
-      {
+      }
+      /* {
         test: /\.js$/,
         exclude: /node_modules/,
         use: { loader: 'eslint-loader' }
-      }
+      } */
     ]
   },
   output: {

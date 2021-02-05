@@ -5,7 +5,7 @@
   "main": "dist/main.bundle.js",
   "browser": "dist/main.bundle.js",
   "scripts": {
-    "build": "webpack --config ./webpack.config.js --mode production",
+    "build": "webpack --config ./webpack.config.js --mode development",
     "lint": "eslint . --ext .js",
     "test": "mocha './test/**/*.js'"
   },
@@ -16,6 +16,7 @@
     "@babel/core": "^7.6.4",
     "@babel/plugin-transform-runtime": "^7.6.2",
     "@babel/preset-env": "^7.6.3",
+    "babel-preset-solid": "^0.23.8",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "chai": "^4.2.0",
@@ -33,6 +34,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.6.3",
+    "solid-js": "^0.23.11",
     "vdom-parser": "^1.4.1",
     "virtual-dom": "^2.1.1"
   }

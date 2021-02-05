@@ -1,16 +1,5 @@
-import diff from 'virtual-dom/diff'
-import parser from 'vdom-parser'
-import patch from 'virtual-dom/patch'
-
-const vDomState = {
-  rootNode: undefined,
-  vDomTree: undefined
-}
-
-const mountPage = (newVDomTree) => {
-  vDomState.rootNode = patch(vDomState.rootNode, diff(vDomState.vDomTree, newVDomTree))
-  vDomState.vDomTree = newVDomTree
-}
+import { createState } from 'solid-js'
+import { render as renderApp } from 'solid-js/web'
 
 export default (setupProps) => {
   if (typeof setupProps.afterProviders !== 'undefined' && typeof setupProps.afterProviders !== 'function') {
@@ -51,43 +40,54 @@ export default (setupProps) => {
       throw new TypeError('slots must be an object of functions')
     }
 
-    const actionResults = { ...setupProps.store, errors: {} }
+    const [state, updateState] = createState({ actionResults: { ...setupProps.store, errors: {} } })
+
     const handleError = (error) => {
-      if (!actionResults.errors[error.name]) {
-        actionResults.errors[error.name] = error
+      const errors = { ...state.actionResults.errors }
+
+      if (!errors[error.name]) {
+        errors[error.name] = error
       } else {
         Object.getOwnPropertyNames(error)
-          .reduce((acc, propName) => Object.assign(acc, { [propName]: error[propName] }), actionResults.errors[error.name])
+          .reduce((acc, propName) => Object.assign(acc, { [propName]: error[propName] }), errors[error.name])
 
-        actionResults.errors[error.name].isCancelled = false
+        errors[error.name].isCancelled = false
       }
 
-      actionResults.errors[error.name].throwCount = actionResults.errors[error.name].throwCount || 0
-      actionResults.errors[error.name].throwCount += 1
+      errors[error.name].throwCount = errors[error.name].throwCount || 0
+      errors[error.name].throwCount += 1
 
       if (error.due) {
         Object.assign(
-          actionResults.errors,
+          errors,
           error.due.reduce((acc, error) => ({ ...acc, [error.name]: error }), {})
         )
       }
 
-      mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+      updateState('actionResults', {
+        ...state.actionResults,
+        errors
+      })
     }
     const nativeCommands = {
       cancelError: ({ errorName, shouldRerender = true }) => {
-        if (actionResults.errors[errorName]) {
-          actionResults.errors[errorName].isCancelled = true
+        const errors = { ...state.actionResults.errors }
 
-          if (actionResults.errors[errorName].due) {
-            actionResults.errors[errorName].due.forEach((error) => {
+        if (errors[errorName]) {
+          errors[errorName].isCancelled = true
+
+          if (errors[errorName].due) {
+            errors[errorName].due.forEach((error) => {
               error.isCancelled = true
             })
           }
         }
 
         if (shouldRerender) {
-          mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+          updateState('actionResults', {
+            ...state.actionResults,
+            errors
+          })
         }
       },
       redirect (path) {
@@ -95,23 +95,27 @@ export default (setupProps) => {
       },
       reload: async () => {
         await runProviders()
-        mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
       },
-      rerender: () => mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() })),
+      rerender: () => updateState('actionResults', { ...state.actionResults, forceRerender: (new Date().getTime()) }),
       runTogether: async (commandsToRun) => {
         try {
+          const commandResults = {}
+
           for (const command of commandsToRun) {
             const [commandName, ...args] = command
             const commandBeingExecuted = allCommands[commandName](...args)
 
             if (commandBeingExecuted instanceof Promise) {
-              actionResults[commandName] = await commandBeingExecuted
+              commandResults[commandName] = await commandBeingExecuted
             } else {
-              actionResults[commandName] = commandBeingExecuted
+              commandResults[commandName] = commandBeingExecuted
             }
           }
 
-          mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+          updateState('actionResults', {
+            ...state.actionResults,
+            ...commandResults
+          })
         } catch (err) {
           handleError(err)
         }
@@ -122,12 +126,11 @@ export default (setupProps) => {
       ...setupProps.commands,
       ...nativeCommands
     }
-    const createSlotRenderer = (commandBeingExecuted = null) => ({ id }) => {
+    const createSlotRenderer = () => ({ id }) => {
       if (slots[id]) {
         return hostData => slots[id]({
-          actionResults,
+          actionResults: state.actionResults,
           actions: boundCommands,
-          commandBeingExecuted,
           hostData
         })
       }
@@ -141,35 +144,33 @@ export default (setupProps) => {
           const commandBeingExecuted = allCommands[commandName](...args)
 
           if (commandBeingExecuted instanceof Promise) {
-            mountPage(renderPage({ actionResults, getSlot: createSlotRenderer(commandName) }))
+            updateState('actionResults', commandName, commandBeingExecuted)
             return commandBeingExecuted
               .then((result) => {
-                actionResults[commandName] = result
-                mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+                updateState('actionResults', commandName, result)
               })
               .catch(handleError)
           }
-          actionResults[commandName] = commandBeingExecuted
-          mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
-          return actionResults[commandName]
+
+          updateState('actionResults', commandName, commandBeingExecuted)
+          return commandBeingExecuted
         } catch (err) {
           handleError(err)
         }
       }
     }), { ...nativeCommands })
     const incomingDataProvided = (providerName, data) => {
-      actionResults[providerName] = data
       liveProviderPromises.priv[providerName].resolve(data)
-      mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+      updateState('actionResults', providerName, data)
     }
     const liveProviderPromises = { priv: {}, pub: {} }
     const initializedLiveProviders = []
     const runProviders = async () => {
       for (const providerName of providers) {
-        const providerBeingExecuted = setupProps.providers[providerName](actionResults)
+        const providerBeingExecuted = setupProps.providers[providerName](state.actionResults)
 
         if (providerBeingExecuted instanceof Promise) {
-          actionResults[providerName] = await providerBeingExecuted
+          updateState('actionResults', providerName, await providerBeingExecuted)
         } else if (typeof providerBeingExecuted === 'function') {
           liveProviderPromises.pub[providerName] = new Promise((resolve, reject) => {
             setTimeout(() => {
@@ -184,25 +185,26 @@ export default (setupProps) => {
           })
           initializedLiveProviders.push(providerName)
         } else {
-          actionResults[providerName] = providerBeingExecuted
+          updateState('actionResults', providerName, providerBeingExecuted)
         }
       }
     }
 
-    actionResults.getNativeCommands = nativeCommands
-    actionResults.route = global.window.location
-    actionResults.parseRootNodeDataset = { ...rootNode.dataset }
-    vDomState.rootNode = rootNode
-
-    if (!vDomState.vDomTree) {
-      vDomState.vDomTree = parser(rootNode)
-    }
+    updateState('actionResults', 'getNativeCommands', nativeCommands)
+    updateState('actionResults', 'route', global.window.location)
+    updateState('actionResults', 'parseRootNodeDataset', { ...rootNode.dataset })
 
     await runProviders()
-    mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+    rootNode.innerHTML = ''
+    renderApp(() => renderPage({ actionResults: state.actionResults, getSlot: createSlotRenderer() }), rootNode)
 
     if (typeof setupProps.afterProviders === 'function') {
       setupProps.afterProviders()
+    }
+
+    return {
+      commands: boundCommands,
+      store: state.actionResults
     }
   }
 }
