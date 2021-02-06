@@ -1,4 +1,6 @@
 import { createPageInitializer } from './index'
+import renderSlot from './slot.jsx'
+import renderPage from './layout.jsx'
 
 const initPage = createPageInitializer({
   commands: {
@@ -11,7 +13,7 @@ const initPage = createPageInitializer({
   providers: {
     syncProvider: () => 'result of sync provider',
     asyncProvider: async () => new Promise(resolve => setTimeout(() => resolve('result of async provider'), 500)),
-    combiningProvider: actionResults => `${actionResults.syncProvider} and ${actionResults.asyncProvider}}`,
+    combiningProvider: actionResults => `${actionResults.syncProvider} and ${actionResults.asyncProvider}`,
     incomingDataProvider: actionResults => async ({
       asyncResults,
       hasBeenInitialized,
@@ -53,62 +55,8 @@ initPage({
     'incomingDataProvider'
   ],
   rootNode: global.document.querySelector('#layout'),
-  renderPage: ({ getSlot }) => {
-    return (<div>{getSlot({ id: 'content' })}</div>)
-  },
+  renderPage,
   slots: {
-    content: ({ actionResults, actions }) => (
-      <div>
-        <p>Provider results: {actionResults.combiningProvider}</p>
-        <p>Incoming data provider result: {actionResults.incomingDataProvider}</p>
-        <p>
-          <button
-            onClick={() => {
-              actions.syncCommand()
-            }}
-          >Sync command</button>{` ${actionResults.syncCommand || ''}`}
-        </p>
-        <p>
-          <button
-            onClick={() => {
-              actions.asyncCommand()
-            }}
-          >Async command</button>{` ${!actionResults.asyncCommand || actionResults.asyncCommand instanceof Promise ? '' : actionResults.asyncCommand }`}
-        </p>
-        <p>
-          <button
-            onClick={() => {
-              actions.commandThatThrowsError()
-            }}
-          >Command that throws an error</button>{JSON.stringify(actionResults.errors)}
-          <button
-            onClick={() => {
-              actions.cancelError({ errorName: 'Error' })
-            }}
-          >Cancel error</button>
-        </p>
-        <p>
-          <button
-            onClick={() => {
-              actions.runTogether([
-                ['syncCommand'],
-                ['asyncCommand']
-              ])
-            }}
-          >Run commands together</button>{` ${actionResults.syncCommand} and ${actionResults.asyncCommand}`}
-        </p>
-        <p>
-          <button
-            onClick={() => {
-              actions.runTogether([
-                ['syncCommand'],
-                ['asyncCommand'],
-                ['reload']
-              ])
-            }}
-          >Reload after running commands</button>{Object.keys(actionResults).map(key => `${key}: ${JSON.stringify(actionResults[key])}`).join(', ')}
-        </p>
-      </div>
-    )
+    content: ({ actionResults, actions }) => renderSlot({ actionResults, actions, syncCommand: actionResults.syncCommand })
   }
 })

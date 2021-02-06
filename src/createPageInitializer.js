@@ -40,7 +40,20 @@ export default (setupProps) => {
       throw new TypeError('slots must be an object of functions')
     }
 
-    const [state, updateState] = createState({ actionResults: { ...setupProps.store, errors: {} } })
+    const [state, updateState] = createState({
+      actionResults: {
+        ...Object.keys(setupProps.commands).reduce((acc, commandName) => ({
+          ...acc,
+          [commandName]: undefined
+        }), {}),
+        ...providers.reduce((acc, providerName) => ({
+          ...acc,
+          [providerName]: undefined
+        }), {}),
+        ...setupProps.store,
+        errors: {}
+      }
+    })
 
     const handleError = (error) => {
       const errors = { ...state.actionResults.errors }

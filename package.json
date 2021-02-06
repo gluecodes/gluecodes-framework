@@ -5,7 +5,7 @@
   "main": "dist/main.bundle.js",
   "browser": "dist/main.bundle.js",
   "scripts": {
-    "build": "webpack --config ./webpack.config.js --mode development",
+    "build": "webpack --config ./webpack.config.js --mode production",
     "lint": "eslint . --ext .js",
     "test": "mocha './test/**/*.js'"
   },
