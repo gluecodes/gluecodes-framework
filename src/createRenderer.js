@@ -1,4 +1,4 @@
-import h from "solid-js/h";
+import h from 'solid-js/h'
 
 export default () => (tagName, props, ...children) => {
   if (tagName === 'fragment' || (props && props.attributes && props.attributes['gc-as'] === 'widget')) {

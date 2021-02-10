@@ -1,7 +1,7 @@
-import { createState } from 'solid-js'
-import { render as renderApp } from 'solid-js/web'
-
 export default (setupProps) => {
+  const { onCreateAppState, onRenderApp } = setupProps
+  const nativeErrors = ['Error', 'EvalError', 'InternalError', 'RangeError', 'ReferenceError', 'SyntaxError', 'TypeError', 'URIError']
+
   if (typeof setupProps.afterProviders !== 'undefined' && typeof setupProps.afterProviders !== 'function') {
     throw new TypeError('setupProps.afterProviders must be a function')
   }
@@ -40,8 +40,10 @@ export default (setupProps) => {
       throw new TypeError('slots must be an object of functions')
     }
 
-    const [state, updateState] = createState({
+    const [state, updateState] = onCreateAppState({
       actionResults: {
+        parseRootNodeDataset: { ...rootNode.dataset },
+        route: global.window.location,
         ...Object.keys(setupProps.commands).reduce((acc, commandName) => ({
           ...acc,
           [commandName]: undefined
@@ -51,56 +53,42 @@ export default (setupProps) => {
           [providerName]: undefined
         }), {}),
         ...setupProps.store,
-        errors: {}
+        errors: [...nativeErrors, ...(setupProps.errors || [])].reduce((acc, errorName) => ({
+          ...acc,
+          [errorName]: { isCancelled: true, throwCount: 0 }
+        }), {})
       }
     })
 
     const handleError = (error) => {
-      const errors = { ...state.actionResults.errors }
+      const serializableError = Object.getOwnPropertyNames(error)
+        .reduce((acc, propName) => ({
+          ...acc,
+          [propName]: error[propName]
+        }), {})
 
-      if (!errors[error.name]) {
-        errors[error.name] = error
-      } else {
-        Object.getOwnPropertyNames(error)
-          .reduce((acc, propName) => Object.assign(acc, { [propName]: error[propName] }), errors[error.name])
-
-        errors[error.name].isCancelled = false
-      }
-
-      errors[error.name].throwCount = errors[error.name].throwCount || 0
-      errors[error.name].throwCount += 1
+      updateState('actionResults', 'errors', error.name, {
+        ...serializableError,
+        isCancelled: false,
+        throwCount: state.actionResults.errors[error.name].throwCount + 1
+      })
 
       if (error.due) {
-        Object.assign(
-          errors,
-          error.due.reduce((acc, error) => ({ ...acc, [error.name]: error }), {})
-        )
+        error.due.forEach((error) => {
+          handleError(error)
+        })
       }
-
-      updateState('actionResults', {
-        ...state.actionResults,
-        errors
-      })
     }
     const nativeCommands = {
-      cancelError: ({ errorName, shouldRerender = true }) => {
-        const errors = { ...state.actionResults.errors }
+      cancelError: ({ errorName }) => {
+        if (state.actionResults.errors[errorName]) {
+          updateState('actionResults', 'errors', errorName, 'isCancelled', true)
 
-        if (errors[errorName]) {
-          errors[errorName].isCancelled = true
-
-          if (errors[errorName].due) {
-            errors[errorName].due.forEach((error) => {
-              error.isCancelled = true
+          if (state.actionResults.errors[errorName].due) {
+            state.actionResults.errors[errorName].due.forEach((error) => {
+              updateState('actionResults', 'errors', error.name, 'isCancelled', true)
             })
           }
-        }
-
-        if (shouldRerender) {
-          updateState('actionResults', {
-            ...state.actionResults,
-            errors
-          })
         }
       },
       redirect (path) {
@@ -204,12 +192,10 @@ export default (setupProps) => {
     }
 
     updateState('actionResults', 'getNativeCommands', nativeCommands)
-    updateState('actionResults', 'route', global.window.location)
-    updateState('actionResults', 'parseRootNodeDataset', { ...rootNode.dataset })
 
     await runProviders()
     rootNode.innerHTML = ''
-    renderApp(() => renderPage({ actionResults: state.actionResults, getSlot: createSlotRenderer() }), rootNode)
+    onRenderApp(() => renderPage({ actionResults: state.actionResults, getSlot: createSlotRenderer() }), rootNode)
 
     if (typeof setupProps.afterProviders === 'function') {
       setupProps.afterProviders()

@@ -1,1 +1,1 @@
-export default ({ getSlot }) => <div>{getSlot({ id: 'content' })}</div>
+export default ({ getSlot }) => <>{getSlot({ id: 'content' })}</>

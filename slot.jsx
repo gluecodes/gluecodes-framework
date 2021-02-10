@@ -1,9 +1,8 @@
 export default ({
-  syncCommand,
   actionResults,
   actions
 }) => (
-  <div>
+  <>
     <p>Provider results: {actionResults.combiningProvider}</p>
     <p>Incoming data provider result: {actionResults.incomingDataProvider}</p>
     <p>
@@ -11,7 +10,7 @@ export default ({
         onClick={() => {
           actions.syncCommand()
         }}
-      >Sync command</button>{` ${syncCommand || ''}`}
+      >Sync command</button>{` ${actionResults.syncCommand || ''}`}
     </p>
     <p>
       <button
@@ -25,7 +24,7 @@ export default ({
         onClick={() => {
           actions.commandThatThrowsError()
         }}
-      >Command that throws an error</button>{JSON.stringify(actionResults.errors)}
+      >Command that throws an error</button>{JSON.stringify(actionResults.errors.Error)}
       <button
         onClick={() => {
           actions.cancelError({ errorName: 'Error' })
@@ -53,5 +52,5 @@ export default ({
         }}
       >Reload after running commands</button>{Object.keys(actionResults).map(key => `${key}: ${JSON.stringify(actionResults[key])}`).join(', ')}
     </p>
-  </div>
+  </>
 )

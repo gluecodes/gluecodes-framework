@@ -1,3 +1,5 @@
+import { createState as createAppState } from 'solid-js'
+import { render as renderApp } from 'solid-js/web'
 import { createPageInitializer } from './index'
 import renderSlot from './slot.jsx'
 import renderPage from './layout.jsx'
@@ -43,7 +45,9 @@ const initPage = createPageInitializer({
       resolve()
     }, 500))
   },
-  store: {}
+  store: {},
+  onCreateAppState: createAppState,
+  onRenderApp: renderApp
 })
 
 initPage({
@@ -57,6 +61,6 @@ initPage({
   rootNode: global.document.querySelector('#layout'),
   renderPage,
   slots: {
-    content: ({ actionResults, actions }) => renderSlot({ actionResults, actions, syncCommand: actionResults.syncCommand })
+    content: ({ actionResults, actions }) => renderSlot({ actionResults, actions })
   }
 })
