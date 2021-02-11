@@ -61,6 +61,7 @@ export default (setupProps) => {
     })
 
     const handleError = (error) => {
+      console.log(error.name)
       const serializableError = Object.getOwnPropertyNames(error)
         .reduce((acc, propName) => ({
           ...acc,

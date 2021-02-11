@@ -35,7 +35,7 @@ const stringifyNode = (name, props, children) => {
         })
       } else if (propName === 'style') {
         acc.push(`${propName}="${styleObjectToString(props[propName])}"`)
-      } else if (!/^on[a-z]+$/.test(propName) && !['gc-onceDomNodeVisited', 'gc-onDomNodeConnected'].includes(propName)) {
+      } else if (!/^on[A-Z]/.test(propName) && propName !== 'ref') {
         acc.push(`${propName}="${props[propName]}"`)
       }
 
