@@ -1,6 +1,5 @@
 export default (setupProps) => {
   const { onCreateAppState, onRenderApp } = setupProps
-  const nativeErrors = ['Error', 'EvalError', 'InternalError', 'RangeError', 'ReferenceError', 'SyntaxError', 'TypeError', 'URIError']
 
   if (typeof setupProps.afterProviders !== 'undefined' && typeof setupProps.afterProviders !== 'function') {
     throw new TypeError('setupProps.afterProviders must be a function')
@@ -53,15 +52,11 @@ export default (setupProps) => {
           [providerName]: undefined
         }), {}),
         ...setupProps.store,
-        errors: [...nativeErrors, ...(setupProps.errors || [])].reduce((acc, errorName) => ({
-          ...acc,
-          [errorName]: { isCancelled: true, throwCount: 0 }
-        }), {})
+        errors: {}
       }
     })
 
     const handleError = (error) => {
-      console.log(error.name)
       const serializableError = Object.getOwnPropertyNames(error)
         .reduce((acc, propName) => ({
           ...acc,
@@ -71,7 +66,7 @@ export default (setupProps) => {
       updateState('actionResults', 'errors', error.name, {
         ...serializableError,
         isCancelled: false,
-        throwCount: state.actionResults.errors[error.name].throwCount + 1
+        throwCount: (state.actionResults.errors[error.name]?.throwCount ? state.actionResults.errors[error.name].throwCount : 0) + 1
       })
 
       if (error.due) {
