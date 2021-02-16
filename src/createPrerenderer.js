@@ -25,6 +25,14 @@ const styleObjectToString = (styleObject) => {
 }
 
 const stringifyNode = (name, props, children) => {
+  if (name === 'Show') { // @todo add more of the flow control tags
+    if (props.when) {
+      return children
+    }
+
+    return ''
+  }
+
   const attrs = Object.keys(props)
     .reduce((acc, propName) => {
       if (propName === 'className') {
@@ -35,7 +43,7 @@ const stringifyNode = (name, props, children) => {
         })
       } else if (propName === 'style') {
         acc.push(`${propName}="${styleObjectToString(props[propName])}"`)
-      } else if (!/^on[A-Z]/.test(propName) && propName !== 'ref') {
+      } else if (!/^on[A-Z]/.test(propName) && !['checked', 'ref'].includes(propName)) {
         acc.push(`${propName}="${props[propName]}"`)
       }
 
@@ -50,4 +58,14 @@ const stringifyNode = (name, props, children) => {
   return `<${name}${attrs ? ` ${attrs}` : ''}>${children.join('')}</${name}>`
 }
 
-export default () => (name, props, ...children) => stringifyNode(name, props || {}, flattenChildren(children))
+export default () => (name, props, ...children) => {
+  if (typeof name === 'function') {
+    return name(props || {})
+  }
+
+  if (name === 'fragment') {
+    return children
+  }
+
+  return stringifyNode(name, props || {}, flattenChildren(children))
+}
