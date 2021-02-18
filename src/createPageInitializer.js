@@ -1,3 +1,23 @@
+const haveStateChanged = (existingState, newState) => {
+  if (newState === existingState) {
+    return false
+  }
+
+  if (typeof existingState === 'undefined') {
+    return true
+  }
+
+  if (['Array', 'Object'].includes(existingState?.constructor.name)) {
+    if (!['Array', 'Object'].includes(newState?.constructor.name)) {
+      return true
+    }
+
+    return JSON.stringify(newState) !== JSON.stringify(existingState)
+  }
+
+  return true
+}
+
 export default (setupProps) => {
   const { onCreateAppState, onRenderApp } = setupProps
 
@@ -41,6 +61,7 @@ export default (setupProps) => {
 
     const [state, updateState] = onCreateAppState({
       actionResults: {
+        reload: undefined,
         parseRootNodeDataset: { ...rootNode.dataset },
         route: global.window.location,
         ...Object.keys(setupProps.commands).reduce((acc, commandName) => ({
@@ -55,6 +76,17 @@ export default (setupProps) => {
         errors: {}
       }
     })
+
+    const updateActionResult = (actionName, result) => {
+      if (result?.constructor.name === 'Object') {
+        updateState('actionResults', actionResults => ({
+          ...actionResults,
+          [actionName]: result
+        }))
+      } else {
+        updateState('actionResults', actionName, result)
+      }
+    }
 
     const handleError = (error) => {
       const serializableError = Object.getOwnPropertyNames(error)
@@ -90,16 +122,25 @@ export default (setupProps) => {
       redirect (path) {
         global.window.location = `${global.window.location.origin}/${path}`
       },
-      reload: async () => {
+      reload: async (type = 'full') => {
+        console.log('full reload')
+        updateState('actionResults', 'reload', type)
         await runProviders()
       },
       rerender: () => updateState('actionResults', { ...state.actionResults, forceRerender: (new Date().getTime()) }),
       runTogether: async (commandsToRun) => {
         try {
           const commandResults = {}
+          let reloadArgs
 
           for (const command of commandsToRun) {
             const [commandName, ...args] = command
+
+            if (commandName === 'reload') {
+              reloadArgs = args
+              continue
+            }
+
             const commandBeingExecuted = allCommands[commandName](...args)
 
             if (commandBeingExecuted instanceof Promise) {
@@ -109,10 +150,14 @@ export default (setupProps) => {
             }
           }
 
-          updateState('actionResults', {
-            ...state.actionResults,
+          updateState('actionResults', actionResults => ({
+            ...actionResults,
             ...commandResults
-          })
+          }))
+
+          if (reloadArgs) {
+            allCommands.reload(...reloadArgs)
+          }
         } catch (err) {
           handleError(err)
         }
@@ -141,24 +186,28 @@ export default (setupProps) => {
           const commandBeingExecuted = allCommands[commandName](...args)
 
           if (commandBeingExecuted instanceof Promise) {
-            updateState('actionResults', commandName, commandBeingExecuted)
+            updateActionResult(commandName, commandBeingExecuted)
             return commandBeingExecuted
               .then((result) => {
-                updateState('actionResults', commandName, result)
+                updateActionResult(commandName, result)
               })
               .catch(handleError)
           }
 
-          updateState('actionResults', commandName, commandBeingExecuted)
+          updateActionResult(commandName, commandBeingExecuted)
           return commandBeingExecuted
         } catch (err) {
           handleError(err)
         }
       }
     }), { ...nativeCommands })
-    const incomingDataProvided = (providerName, data) => {
-      liveProviderPromises.priv[providerName].resolve(data)
-      updateState('actionResults', providerName, data)
+    const incomingDataProvided = (providerName, result) => {
+      liveProviderPromises.priv[providerName].resolve(result)
+
+      if (haveStateChanged(state.actionResults[providerName], result)) {
+        console.log(providerName, state.actionResults[providerName], result)
+        updateActionResult(providerName, result)
+      }
     }
     const liveProviderPromises = { priv: {}, pub: {} }
     const initializedLiveProviders = []
@@ -167,7 +216,12 @@ export default (setupProps) => {
         const providerBeingExecuted = setupProps.providers[providerName](state.actionResults)
 
         if (providerBeingExecuted instanceof Promise) {
-          updateState('actionResults', providerName, await providerBeingExecuted)
+          const result = await providerBeingExecuted
+
+          if (haveStateChanged(state.actionResults[providerName], result)) {
+            console.log(providerName, state.actionResults[providerName])
+            updateActionResult(providerName, result)
+          }
         } else if (typeof providerBeingExecuted === 'function') {
           liveProviderPromises.pub[providerName] = new Promise((resolve, reject) => {
             setTimeout(() => {
@@ -181,8 +235,9 @@ export default (setupProps) => {
             provide: data => incomingDataProvided(providerName, data)
           })
           initializedLiveProviders.push(providerName)
-        } else {
-          updateState('actionResults', providerName, providerBeingExecuted)
+        } else if (haveStateChanged(state.actionResults[providerName], providerBeingExecuted)) {
+          console.log(providerName, state.actionResults[providerName])
+          updateActionResult(providerName, providerBeingExecuted)
         }
       }
     }
