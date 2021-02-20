@@ -123,7 +123,7 @@ export default (setupProps) => {
         global.window.location = `${global.window.location.origin}/${path}`
       },
       reload: async (type = 'full') => {
-        console.log('full reload')
+        // console.log('full reload')
         updateState('actionResults', 'reload', type)
         await runProviders()
       },
@@ -205,7 +205,7 @@ export default (setupProps) => {
       liveProviderPromises.priv[providerName].resolve(result)
 
       if (haveStateChanged(state.actionResults[providerName], result)) {
-        console.log(providerName, state.actionResults[providerName], result)
+        // console.log(providerName, state.actionResults[providerName], result)
         updateActionResult(providerName, result)
       }
     }
@@ -219,7 +219,7 @@ export default (setupProps) => {
           const result = await providerBeingExecuted
 
           if (haveStateChanged(state.actionResults[providerName], result)) {
-            console.log(providerName, state.actionResults[providerName])
+            // console.log(providerName, state.actionResults[providerName], result)
             updateActionResult(providerName, result)
           }
         } else if (typeof providerBeingExecuted === 'function') {
@@ -236,7 +236,7 @@ export default (setupProps) => {
           })
           initializedLiveProviders.push(providerName)
         } else if (haveStateChanged(state.actionResults[providerName], providerBeingExecuted)) {
-          console.log(providerName, state.actionResults[providerName])
+          // console.log(providerName, state.actionResults[providerName], providerBeingExecuted)
           updateActionResult(providerName, providerBeingExecuted)
         }
       }

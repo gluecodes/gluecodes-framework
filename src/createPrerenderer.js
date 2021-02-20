@@ -33,6 +33,14 @@ const stringifyNode = (name, props, children) => {
     return ''
   }
 
+  if (name === 'For') {
+    return props.each.map(item => children[0](item))
+  }
+
+  if (name === 'Dynamic') {
+    return props.component(props)
+  }
+
   const attrs = Object.keys(props)
     .reduce((acc, propName) => {
       if (propName === 'className') {

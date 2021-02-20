@@ -1,9 +1,12 @@
-import h from 'solid-js/h'
+const rewriteProps = props => Object.keys(props || {}).reduce((acc, propName) => ({
+  ...acc,
+  ...(propName === 'attrs' ? { attrs: undefined, ...props[propName] } : {})
+}), props)
 
-export default () => (tagName, props, ...children) => {
-  if (tagName === 'fragment' || (props && props.attributes && props.attributes['gc-as'] === 'widget')) {
+export default hyperScript => (tagName, props, ...children) => {
+  if (props && props.attributes && props.attributes['gc-as'] === 'widget') {
     return children
   }
 
-  return h(tagName, props, children)
+  return hyperScript(tagName, rewriteProps(props), children)
 }
