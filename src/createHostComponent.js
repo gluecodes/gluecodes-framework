@@ -1,4 +1,5 @@
 export default ({
+  createRenderingSignal,
   glueDomRenderer,
   renderer
 }) => (
@@ -13,13 +14,14 @@ export default ({
   const externalStyles = others
   const componentClassMap = styles
   const injectables = {
+    createRenderingSignal,
     externalStyles,
     fa
   }
 
   for (const className of Object.keys(componentClassMap)) {
     if (!module.customizableClasses.includes(className)) {
-      throw new TypeError(`Class .${className} of ${componentId}.component.css isn't declared as customizable`)
+      throw new TypeError(`Class .${className} isn't declared as customizable`)
     }
 
     externalStyles[className] = [
@@ -49,38 +51,8 @@ export default ({
     global.document.head.appendChild(fontFaceNode)
   })
 
-  return (props) => {
-    const vDomNode = module.render({
-      ...props,
-      _inject: injectables
-    })
-
-    if (typeof vDomNode === 'function' && vDomNode.constructor.name !== 'VirtualNode') {
-      const thunkComponent = vDomNode
-
-      return (...args) => {
-        const vDomNode = thunkComponent(...args)
-
-        if (vDomNode) {
-          vDomNode.properties.className = `${vDomNode.properties.className || ''} gc-role-${componentId}`.trim()
-        }
-
-        return vDomNode
-      }
-    }
-
-    if (Array.isArray(vDomNode)) {
-      vDomNode.forEach((node) => {
-        node.properties.className = `${node.properties.className || ''} gc-role-${componentId}`.trim()
-      })
-
-      return vDomNode
-    }
-
-    if (vDomNode) {
-      vDomNode.properties.className = `${vDomNode.properties.className || ''} gc-role-${componentId}`.trim()
-    }
-
-    return vDomNode
-  }
+  return props => module.render({
+    ...props,
+    _inject: injectables
+  })
 }

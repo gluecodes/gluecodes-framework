@@ -4,7 +4,6 @@ export default ({
 }) => (
   module,
   {
-    componentId,
     getExternalStyles,
     styles
   },
@@ -16,7 +15,7 @@ export default ({
 
   for (const className of Object.keys(componentClassMap)) {
     if (!module.customizableClasses.includes(className)) {
-      throw new TypeError(`Class .${className} of ${componentId}.component.css isn't declared as customizable`)
+      throw new TypeError(`Class .${className} isn't declared as customizable`)
     }
 
     externalStyles[className] = [
@@ -28,19 +27,11 @@ export default ({
   module.setPrerenderer(prerenderer)
   module.setGlueDomPrerenderer(glueDomPrerenderer)
 
-  const html = module.prerender({
+  return module.prerender({
     ...props,
     _inject: {
       externalStyles,
       fa
     }
   }).trim()
-
-  let scopedHtml = html.replace(/^(<[^<>]+)(class="[^"]*)/, `$1$2 gc-role-${componentId}`)
-
-  if (scopedHtml === html) {
-    scopedHtml = html.replace(/^(<[^<>]+)/, `$1 class="gc-role-${componentId}"`)
-  }
-
-  return scopedHtml
 }
