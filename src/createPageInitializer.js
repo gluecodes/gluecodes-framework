@@ -77,6 +77,13 @@ export default (setupProps) => {
       }
     })
 
+    const errorListeners = []
+    const storeChangeListeners = []
+
+    const notifyAboutStoreChanges = (affectedKeys) => {
+      storeChangeListeners.forEach(callback => callback(affectedKeys))
+    }
+
     const updateActionResult = (actionName, result) => {
       if (result?.constructor.name === 'Object') {
         updateState('actionResults', actionResults => ({
@@ -86,6 +93,8 @@ export default (setupProps) => {
       } else {
         updateState('actionResults', actionName, result)
       }
+
+      notifyAboutStoreChanges([actionName])
     }
 
     const handleError = (error) => {
@@ -95,28 +104,73 @@ export default (setupProps) => {
           [propName]: error[propName]
         }), {})
 
-      updateState('actionResults', 'errors', error.name, {
+      updateState('actionResults', actionResults => ({
+        ...actionResults,
+        errors: {
+          ...actionResults.errors,
+          [error.name]: {
+            ...serializableError,
+            isCancelled: false,
+            throwCount: (actionResults.errors[error.name]?.throwCount ? actionResults.errors[error.name].throwCount : 0) + 1
+          }
+        }
+      }))
+
+      /*updateState('actionResults', 'errors', error.name, {
         ...serializableError,
         isCancelled: false,
         throwCount: (state.actionResults.errors[error.name]?.throwCount ? state.actionResults.errors[error.name].throwCount : 0) + 1
-      })
+      })*/
 
       if (error.due) {
         error.due.forEach((error) => {
           handleError(error)
         })
       }
+
+      notifyAboutStoreChanges(['errors'])
+
+      errorListeners.forEach((callback) => {
+        callback(error)
+      })
     }
     const nativeCommands = {
       cancelError: ({ errorName }) => {
         if (state.actionResults.errors[errorName]) {
-          updateState('actionResults', 'errors', errorName, 'isCancelled', true)
+          updateState('actionResults', actionResults => ({
+            ...actionResults,
+            errors: {
+              ...actionResults.errors,
+              [errorName]: {
+                ...actionResults.errors[errorName],
+                isCancelled: true
+              }
+            }
+          }))
+
+          // updateState('actionResults', 'errors', errorName, 'isCancelled', true)
 
           if (state.actionResults.errors[errorName].due) {
             state.actionResults.errors[errorName].due.forEach((error) => {
-              updateState('actionResults', 'errors', error.name, 'isCancelled', true)
+              updateState('actionResults', actionResults => ({
+                ...actionResults,
+                errors: {
+                  ...actionResults.errors,
+                  [error.name]: {
+                    ...actionResults.errors[error.name],
+                    isCancelled: true
+                  }
+                }
+              }))
+              // updateState('actionResults', 'errors', error.name, 'isCancelled', true)
             })
           }
+
+          notifyAboutStoreChanges(['errors'])
+
+          errorListeners.forEach((callback) => {
+            callback(state.actionResults.errors[errorName])
+          })
         }
       },
       redirect (path) {
@@ -155,6 +209,8 @@ export default (setupProps) => {
             ...commandResults
           }))
 
+          notifyAboutStoreChanges(commandsToRun.map(([commandName]) => commandName))
+
           if (reloadArgs) {
             allCommands.reload(...reloadArgs)
           }
@@ -162,7 +218,13 @@ export default (setupProps) => {
           handleError(err)
         }
       },
-      fail: handleError
+      fail: handleError,
+      onError: (callback) => {
+        errorListeners.push(callback)
+      },
+      onStoreChanged: (callback) => {
+        storeChangeListeners.push(callback)
+      }
     }
     const allCommands = {
       ...setupProps.commands,

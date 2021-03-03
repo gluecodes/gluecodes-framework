@@ -1,4 +1,28 @@
-const selfClosingTags = ['br', 'img', 'hr', 'input', 'source']
+const selfClosingTags = [
+  'area',
+  'base',
+  'basefont',
+  'bgsound',
+  'br',
+  'col',
+  'command',
+  'embed',
+  'frame',
+  'hr',
+  'image',
+  'img',
+  'input',
+  'isindex',
+  'keygen',
+  'link',
+  'menuitem',
+  'meta',
+  'nextid',
+  'param',
+  'source',
+  'track',
+  'wbr'
+]
 
 function flattenChildren (htmlChunks) {
   return htmlChunks.map((child) => {
@@ -34,7 +58,7 @@ const stringifyNode = (name, props, children) => {
   }
 
   if (name === 'For') {
-    return props.each.map(item => children[0](item))
+    return props.each.map((item, index) => children[0](item, () => index))
   }
 
   if (name === 'Dynamic') {
@@ -51,7 +75,11 @@ const stringifyNode = (name, props, children) => {
         })
       } else if (propName === 'style') {
         acc.push(`${propName}="${styleObjectToString(props[propName])}"`)
-      } else if (!/^on[A-Z]/.test(propName) && !['checked', 'ref'].includes(propName)) {
+      } else if (typeof props[propName] === 'boolean') {
+        if (props[propName]) {
+          acc.push(propName)
+        }
+      } else if (!/^on[A-Z]/.test(propName) && !['ref'].includes(propName) && typeof props[propName] !== 'undefined') {
         acc.push(`${propName}="${props[propName]}"`)
       }
 
