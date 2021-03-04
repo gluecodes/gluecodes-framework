@@ -116,11 +116,11 @@ export default (setupProps) => {
         }
       }))
 
-      /*updateState('actionResults', 'errors', error.name, {
+      /* updateState('actionResults', 'errors', error.name, {
         ...serializableError,
         isCancelled: false,
         throwCount: (state.actionResults.errors[error.name]?.throwCount ? state.actionResults.errors[error.name].throwCount : 0) + 1
-      })*/
+      }) */
 
       if (error.due) {
         error.due.forEach((error) => {
