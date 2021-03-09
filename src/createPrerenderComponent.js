@@ -1,37 +1,26 @@
-export default ({
-  glueDomPrerenderer,
-  prerenderer
-}) => (
+export default ({ glueDomPrerenderer }) => (
   module,
   {
-    getExternalStyles,
-    styles
+    globalStyles,
+    styleOverrides
   },
   props
 ) => {
-  const { fa, others } = getExternalStyles()
-  const externalStyles = others
-  const componentClassMap = styles
-
-  for (const className of Object.keys(componentClassMap)) {
+  for (const className of Object.keys(styleOverrides)) {
     if (!module.customizableClasses.includes(className)) {
       throw new TypeError(`Class .${className} isn't declared as customizable`)
     }
-
-    externalStyles[className] = [
-      ...(externalStyles[className] ? externalStyles[className].split(' ') : []),
-      componentClassMap[className]
-    ].join(' ')
   }
 
-  module.setPrerenderer(prerenderer)
   module.setGlueDomPrerenderer(glueDomPrerenderer)
 
   return module.prerender({
     ...props,
     _inject: {
-      externalStyles,
-      fa
-    }
-  }).trim()
+      externalStyles: globalStyles.others,
+      fa: globalStyles.fa,
+      styleOverrides
+    },
+    _onStateChanged: () => {}
+  }).t
 }

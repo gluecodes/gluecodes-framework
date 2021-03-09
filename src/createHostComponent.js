@@ -1,36 +1,16 @@
-export default ({
-  createRenderingSignal,
-  glueDomRenderer,
-  renderer
-}) => (
+export default ({ glueDomRenderer }) => (
   module,
   {
-    componentId,
-    getExternalStyles,
-    styles
+    globalStyles,
+    styleOverrides
   }
 ) => {
-  const { fa, others } = getExternalStyles()
-  const externalStyles = others
-  const componentClassMap = styles
-  const injectables = {
-    createRenderingSignal,
-    externalStyles,
-    fa
-  }
-
-  for (const className of Object.keys(componentClassMap)) {
+  for (const className of Object.keys(styleOverrides)) {
     if (!module.customizableClasses.includes(className)) {
       throw new TypeError(`Class .${className} isn't declared as customizable`)
     }
-
-    externalStyles[className] = [
-      ...(externalStyles[className] ? externalStyles[className].split(' ') : []),
-      componentClassMap[className]
-    ].join(' ')
   }
 
-  module.setRenderer(renderer)
   module.setGlueDomRenderer(glueDomRenderer)
 
   // import fonts
@@ -53,6 +33,10 @@ export default ({
 
   return props => module.render({
     ...props,
-    _inject: injectables
+    _inject: {
+      externalStyles: globalStyles.others,
+      fa: globalStyles.fa,
+      styleOverrides
+    }
   })
 }
