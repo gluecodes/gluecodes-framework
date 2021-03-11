@@ -252,6 +252,7 @@ export default (setupProps) => {
             return commandBeingExecuted
               .then((result) => {
                 updateActionResult(commandName, result)
+                return result
               })
               .catch(handleError)
           }
