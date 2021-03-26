@@ -1,5 +1,5 @@
 const filterAttrs = attrs => Object.keys(attrs).reduce((acc, attrName) => {
-  if (!/^gc-/.test(attrName)) {
+  if (!/^gc-/.test(attrName) || (attrName === 'gc-as' && attrs[attrName] === 'slot') || (attrName === 'gc-name' && attrs['gc-as'] === 'slot')) {
     acc[attrName] = attrs[attrName]
   }
 
