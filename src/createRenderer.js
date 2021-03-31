@@ -15,7 +15,7 @@ const rewriteProps = props => Object.keys(props || {}).reduce((acc, propName) =>
 }), props)
 
 export default hyperScript => (tagName, props, ...children) => {
-  if (props && props.attributes && props.attributes['gc-as'] === 'widget') {
+  if (tagName === 'fragment' || (props && props.attrs && props.attrs['gc-as'] === 'widget')) {
     return children
   }
 
