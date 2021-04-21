@@ -5,7 +5,16 @@ export default ({ glueDomRenderer }) => (
     styleOverrides
   }
 ) => {
-  const externalStyles = {}
+  const externalStyles = new Proxy({}, {
+    get: (target, className) => (
+      Object.keys(globalStyles.others).reduce((acc, moduleName) => {
+        if (globalStyles.others[moduleName][className]) {
+          acc.push(globalStyles.others[moduleName][className])
+        }
+        return acc
+      }, []).join(' ')
+    )
+  })
 
   for (const className of Object.keys(styleOverrides)) {
     if (!module.customizableClasses.includes(className)) {
@@ -32,14 +41,6 @@ export default ({ glueDomRenderer }) => (
     global.document.head.appendChild(preloadNode)
     global.document.head.appendChild(fontFaceNode)
   })
-
-  if (globalStyles.others) {
-    Object.keys(globalStyles.others).forEach((moduleName) => {
-      Object.keys(globalStyles.others[moduleName]).forEach((className) => {
-        externalStyles[className] = externalStyles[className] ? `${externalStyles[className]} ${globalStyles.others[moduleName][className]}` : externalStyles[className]
-      })
-    })
-  }
 
   return props => module.render({
     ...props,
