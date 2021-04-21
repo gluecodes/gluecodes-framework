@@ -5,7 +5,7 @@ export default ({ glueDomRenderer }) => (
     styleOverrides
   }
 ) => {
-  const externalStyles = new Proxy({}, {
+  const externalStylesProxy = new Proxy({}, {
     get: (target, className) => (
       Object.keys(globalStyles.others).reduce((acc, moduleName) => {
         if (globalStyles.others[moduleName][className]) {
@@ -14,6 +14,17 @@ export default ({ glueDomRenderer }) => (
         return acc
       }, []).join(' ')
     )
+  })
+
+  const styleOverridesProxy = new Proxy({}, {
+    get: (target, className) => {
+      return Object.keys(globalStyles.others).reduce((acc, moduleName) => {
+        if (moduleName !== 'bootstrap' && globalStyles.others[moduleName][className]) {
+          acc.push(globalStyles.others[moduleName][className])
+        }
+        return acc
+      }, [styleOverrides[className]]).join(' ')
+    }
   })
 
   for (const className of Object.keys(styleOverrides)) {
@@ -45,9 +56,9 @@ export default ({ glueDomRenderer }) => (
   return props => module.render({
     ...props,
     _inject: {
-      externalStyles,
+      externalStyles: externalStylesProxy,
       fa: globalStyles.fa,
-      styleOverrides
+      styleOverrides: styleOverridesProxy
     }
   })
 }
