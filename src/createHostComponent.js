@@ -5,6 +5,8 @@ export default ({ glueDomRenderer }) => (
     styleOverrides
   }
 ) => {
+  const externalStyles = {}
+
   for (const className of Object.keys(styleOverrides)) {
     if (!module.customizableClasses.includes(className)) {
       throw new TypeError(`Class .${className} isn't declared as customizable`)
@@ -31,10 +33,16 @@ export default ({ glueDomRenderer }) => (
     global.document.head.appendChild(fontFaceNode)
   })
 
+  Object.keys(globalStyles.others).forEach((moduleName) => {
+    Object.keys(globalStyles.others[moduleName]).forEach((className) => {
+      externalStyles[className] = externalStyles[className] ? `${externalStyles[className]} ${globalStyles.others[moduleName][className]}` : externalStyles[className]
+    })
+  })
+
   return props => module.render({
     ...props,
     _inject: {
-      externalStyles: globalStyles.others,
+      externalStyles,
       fa: globalStyles.fa,
       styleOverrides
     }
