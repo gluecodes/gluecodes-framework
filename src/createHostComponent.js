@@ -33,11 +33,13 @@ export default ({ glueDomRenderer }) => (
     global.document.head.appendChild(fontFaceNode)
   })
 
-  Object.keys(globalStyles.others).forEach((moduleName) => {
-    Object.keys(globalStyles.others[moduleName]).forEach((className) => {
-      externalStyles[className] = externalStyles[className] ? `${externalStyles[className]} ${globalStyles.others[moduleName][className]}` : externalStyles[className]
+  if (globalStyles.others) {
+    Object.keys(globalStyles.others).forEach((moduleName) => {
+      Object.keys(globalStyles.others[moduleName]).forEach((className) => {
+        externalStyles[className] = externalStyles[className] ? `${externalStyles[className]} ${globalStyles.others[moduleName][className]}` : externalStyles[className]
+      })
     })
-  })
+  }
 
   return props => module.render({
     ...props,
