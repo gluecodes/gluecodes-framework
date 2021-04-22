@@ -5,23 +5,42 @@ export default ({ glueDomRenderer }) => (
     styleOverrides
   }
 ) => {
+  const unimportedClassNameProxy = new Proxy({}, {
+    get: (target, prop) => {
+      if (typeof prop === 'string' && prop !== '__proto__') {
+        return `unimported_${prop}`
+      }
+
+      return null
+    }
+  })
+
   const externalStylesProxy = new Proxy({}, {
-    get: (target, className) => (
-      Object.keys(globalStyles.others).reduce((acc, moduleName) => {
+    get: (target, className) => {
+      if (!globalStyles.others) {
+        return unimportedClassNameProxy[className]
+      }
+
+      return Object.keys(globalStyles.others).reduce((acc, moduleName) => {
         if (globalStyles.others[moduleName][className]) {
           acc.push(globalStyles.others[moduleName][className])
         }
         return acc
       }, []).join(' ')
-    )
+    }
   })
 
   const styleOverridesProxy = new Proxy({}, {
     get: (target, className) => {
+      if (!globalStyles.others) {
+        return styleOverrides[className]
+      }
+
       return Object.keys(globalStyles.others).reduce((acc, moduleName) => {
         if (moduleName !== 'bootstrap' && globalStyles.others[moduleName][className]) {
           acc.push(globalStyles.others[moduleName][className])
         }
+
         return acc
       }, [styleOverrides[className]]).join(' ')
     }
