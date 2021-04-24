@@ -1,4 +1,28 @@
-const selfClosingTags = ['br', 'img', 'hr', 'input', 'source']
+const selfClosingTags = [
+  'area',
+  'base',
+  'basefont',
+  'bgsound',
+  'br',
+  'col',
+  'command',
+  'embed',
+  'frame',
+  'hr',
+  'image',
+  'img',
+  'input',
+  'isindex',
+  'keygen',
+  'link',
+  'menuitem',
+  'meta',
+  'nextid',
+  'param',
+  'source',
+  'track',
+  'wbr'
+]
 
 function flattenChildren (htmlChunks) {
   return htmlChunks.map((child) => {
@@ -25,6 +49,22 @@ const styleObjectToString = (styleObject) => {
 }
 
 const stringifyNode = (name, props, children) => {
+  if (name === 'Show') { // @todo add more of the flow control tags
+    if (props.when) {
+      return children
+    }
+
+    return ''
+  }
+
+  if (name === 'For') {
+    return props.each.map((item, index) => children[0](item, () => index))
+  }
+
+  if (name === 'Dynamic') {
+    return props.component(props)
+  }
+
   const attrs = Object.keys(props)
     .reduce((acc, propName) => {
       if (propName === 'className') {
@@ -35,7 +75,11 @@ const stringifyNode = (name, props, children) => {
         })
       } else if (propName === 'style') {
         acc.push(`${propName}="${styleObjectToString(props[propName])}"`)
-      } else if (!/^on[a-z]+$/.test(propName) && !['gc-onceDomNodeVisited', 'gc-onDomNodeConnected'].includes(propName)) {
+      } else if (typeof props[propName] === 'boolean') {
+        if (props[propName]) {
+          acc.push(propName)
+        }
+      } else if (!/^on[A-Z]/.test(propName) && !['ref'].includes(propName) && typeof props[propName] !== 'undefined') {
         acc.push(`${propName}="${props[propName]}"`)
       }
 
@@ -50,4 +94,14 @@ const stringifyNode = (name, props, children) => {
   return `<${name}${attrs ? ` ${attrs}` : ''}>${children.join('')}</${name}>`
 }
 
-export default () => (name, props, ...children) => stringifyNode(name, props || {}, flattenChildren(children))
+export default () => (name, props, ...children) => {
+  if (typeof name === 'function') {
+    return name(props || {})
+  }
+
+  if (name === 'fragment') {
+    return children
+  }
+
+  return stringifyNode(name, props || {}, flattenChildren(children))
+}

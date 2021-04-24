@@ -1,18 +1,26 @@
-import diff from 'virtual-dom/diff'
-import parser from 'vdom-parser'
-import patch from 'virtual-dom/patch'
+const haveStateChanged = (existingState, newState) => {
+  if (newState === existingState) {
+    return false
+  }
 
-const vDomState = {
-  rootNode: undefined,
-  vDomTree: undefined
-}
+  if (typeof existingState === 'undefined') {
+    return true
+  }
 
-const mountPage = (newVDomTree) => {
-  vDomState.rootNode = patch(vDomState.rootNode, diff(vDomState.vDomTree, newVDomTree))
-  vDomState.vDomTree = newVDomTree
+  if (['Array', 'Object'].includes(existingState?.constructor.name)) {
+    if (!['Array', 'Object'].includes(newState?.constructor.name)) {
+      return true
+    }
+
+    return JSON.stringify(newState) !== JSON.stringify(existingState)
+  }
+
+  return true
 }
 
 export default (setupProps) => {
+  const { onCreateAppState, onRenderApp } = setupProps
+
   if (typeof setupProps.afterProviders !== 'undefined' && typeof setupProps.afterProviders !== 'function') {
     throw new TypeError('setupProps.afterProviders must be a function')
   }
@@ -51,83 +59,182 @@ export default (setupProps) => {
       throw new TypeError('slots must be an object of functions')
     }
 
-    const actionResults = { ...setupProps.store, errors: {} }
-    const handleError = (error) => {
-      if (!actionResults.errors[error.name]) {
-        actionResults.errors[error.name] = error
-      } else {
-        Object.getOwnPropertyNames(error)
-          .reduce((acc, propName) => Object.assign(acc, { [propName]: error[propName] }), actionResults.errors[error.name])
-
-        actionResults.errors[error.name].isCancelled = false
+    const [state, updateState] = onCreateAppState({
+      actionResults: {
+        reload: undefined,
+        parseRootNodeDataset: { ...rootNode.dataset },
+        route: global.window.location,
+        ...Object.keys(setupProps.commands).reduce((acc, commandName) => ({
+          ...acc,
+          [commandName]: undefined
+        }), {}),
+        ...providers.reduce((acc, providerName) => ({
+          ...acc,
+          [providerName]: undefined
+        }), {}),
+        ...setupProps.store,
+        errors: {}
       }
+    })
 
-      actionResults.errors[error.name].throwCount = actionResults.errors[error.name].throwCount || 0
-      actionResults.errors[error.name].throwCount += 1
+    const errorListeners = []
+    const storeChangeListeners = []
 
-      if (error.due) {
-        Object.assign(
-          actionResults.errors,
-          error.due.reduce((acc, error) => ({ ...acc, [error.name]: error }), {})
-        )
-      }
-
-      mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+    const notifyAboutStoreChanges = (affectedKeys) => {
+      storeChangeListeners.forEach(callback => callback(affectedKeys))
     }
-    const nativeCommands = {
-      cancelError: ({ errorName, shouldRerender = true }) => {
-        if (actionResults.errors[errorName]) {
-          actionResults.errors[errorName].isCancelled = true
 
-          if (actionResults.errors[errorName].due) {
-            actionResults.errors[errorName].due.forEach((error) => {
-              error.isCancelled = true
-            })
+    const updateActionResult = (actionName, result) => {
+      if (result?.constructor.name === 'Object') {
+        updateState('actionResults', actionResults => ({
+          ...actionResults,
+          [actionName]: result
+        }))
+      } else {
+        updateState('actionResults', actionName, result)
+      }
+
+      notifyAboutStoreChanges([actionName])
+    }
+
+    const handleError = (error) => {
+      const serializableError = Object.getOwnPropertyNames(error)
+        .reduce((acc, propName) => ({
+          ...acc,
+          [propName]: error[propName]
+        }), {})
+
+      updateState('actionResults', actionResults => ({
+        ...actionResults,
+        errors: {
+          ...actionResults.errors,
+          [error.name]: {
+            ...serializableError,
+            isCancelled: false,
+            throwCount: (actionResults.errors[error.name]?.throwCount ? actionResults.errors[error.name].throwCount : 0) + 1
           }
         }
+      }))
 
-        if (shouldRerender) {
-          mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+      /* updateState('actionResults', 'errors', error.name, {
+        ...serializableError,
+        isCancelled: false,
+        throwCount: (state.actionResults.errors[error.name]?.throwCount ? state.actionResults.errors[error.name].throwCount : 0) + 1
+      }) */
+
+      if (error.due) {
+        error.due.forEach((error) => {
+          handleError(error)
+        })
+      }
+
+      notifyAboutStoreChanges(['errors'])
+
+      errorListeners.forEach((callback) => {
+        callback(error)
+      })
+    }
+    const nativeCommands = {
+      cancelError: ({ errorName }) => {
+        if (state.actionResults.errors[errorName]) {
+          updateState('actionResults', actionResults => ({
+            ...actionResults,
+            errors: {
+              ...actionResults.errors,
+              [errorName]: {
+                ...actionResults.errors[errorName],
+                isCancelled: true
+              }
+            }
+          }))
+
+          // updateState('actionResults', 'errors', errorName, 'isCancelled', true)
+
+          if (state.actionResults.errors[errorName].due) {
+            state.actionResults.errors[errorName].due.forEach((error) => {
+              updateState('actionResults', actionResults => ({
+                ...actionResults,
+                errors: {
+                  ...actionResults.errors,
+                  [error.name]: {
+                    ...actionResults.errors[error.name],
+                    isCancelled: true
+                  }
+                }
+              }))
+              // updateState('actionResults', 'errors', error.name, 'isCancelled', true)
+            })
+          }
+
+          notifyAboutStoreChanges(['errors'])
+
+          errorListeners.forEach((callback) => {
+            callback(state.actionResults.errors[errorName])
+          })
         }
       },
       redirect (path) {
         global.window.location = `${global.window.location.origin}/${path}`
       },
-      reload: async () => {
+      reload: async (type = 'full') => {
+        // console.log('full reload')
+        updateState('actionResults', 'reload', type)
         await runProviders()
-        mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
       },
-      rerender: () => mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() })),
+      rerender: () => updateState('actionResults', { ...state.actionResults, forceRerender: (new Date().getTime()) }),
       runTogether: async (commandsToRun) => {
         try {
+          const commandResults = {}
+          let reloadArgs
+
           for (const command of commandsToRun) {
             const [commandName, ...args] = command
+
+            if (commandName === 'reload') {
+              reloadArgs = args
+              continue
+            }
+
             const commandBeingExecuted = allCommands[commandName](...args)
 
             if (commandBeingExecuted instanceof Promise) {
-              actionResults[commandName] = await commandBeingExecuted
+              commandResults[commandName] = await commandBeingExecuted
             } else {
-              actionResults[commandName] = commandBeingExecuted
+              commandResults[commandName] = commandBeingExecuted
             }
           }
 
-          mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+          updateState('actionResults', actionResults => ({
+            ...actionResults,
+            ...commandResults
+          }))
+
+          notifyAboutStoreChanges(commandsToRun.map(([commandName]) => commandName))
+
+          if (reloadArgs) {
+            allCommands.reload(...reloadArgs)
+          }
         } catch (err) {
           handleError(err)
         }
       },
-      fail: handleError
+      fail: handleError,
+      onError: (callback) => {
+        errorListeners.push(callback)
+      },
+      onStoreChanged: (callback) => {
+        storeChangeListeners.push(callback)
+      }
     }
     const allCommands = {
       ...setupProps.commands,
       ...nativeCommands
     }
-    const createSlotRenderer = (commandBeingExecuted = null) => ({ id }) => {
+    const createSlotRenderer = () => ({ id }) => {
       if (slots[id]) {
         return hostData => slots[id]({
-          actionResults,
+          actionResults: state.actionResults,
           actions: boundCommands,
-          commandBeingExecuted,
           hostData
         })
       }
@@ -141,35 +248,43 @@ export default (setupProps) => {
           const commandBeingExecuted = allCommands[commandName](...args)
 
           if (commandBeingExecuted instanceof Promise) {
-            mountPage(renderPage({ actionResults, getSlot: createSlotRenderer(commandName) }))
+            updateActionResult(commandName, commandBeingExecuted)
             return commandBeingExecuted
               .then((result) => {
-                actionResults[commandName] = result
-                mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+                updateActionResult(commandName, result)
+                return result
               })
               .catch(handleError)
           }
-          actionResults[commandName] = commandBeingExecuted
-          mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
-          return actionResults[commandName]
+
+          updateActionResult(commandName, commandBeingExecuted)
+          return commandBeingExecuted
         } catch (err) {
           handleError(err)
         }
       }
     }), { ...nativeCommands })
-    const incomingDataProvided = (providerName, data) => {
-      actionResults[providerName] = data
-      liveProviderPromises.priv[providerName].resolve(data)
-      mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+    const incomingDataProvided = (providerName, result) => {
+      liveProviderPromises.priv[providerName].resolve(result)
+
+      if (haveStateChanged(state.actionResults[providerName], result)) {
+        // console.log(providerName, state.actionResults[providerName], result)
+        updateActionResult(providerName, result)
+      }
     }
     const liveProviderPromises = { priv: {}, pub: {} }
     const initializedLiveProviders = []
     const runProviders = async () => {
       for (const providerName of providers) {
-        const providerBeingExecuted = setupProps.providers[providerName](actionResults)
+        const providerBeingExecuted = setupProps.providers[providerName](state.actionResults)
 
         if (providerBeingExecuted instanceof Promise) {
-          actionResults[providerName] = await providerBeingExecuted
+          const result = await providerBeingExecuted
+
+          if (haveStateChanged(state.actionResults[providerName], result)) {
+            // console.log(providerName, state.actionResults[providerName], result)
+            updateActionResult(providerName, result)
+          }
         } else if (typeof providerBeingExecuted === 'function') {
           liveProviderPromises.pub[providerName] = new Promise((resolve, reject) => {
             setTimeout(() => {
@@ -183,26 +298,26 @@ export default (setupProps) => {
             provide: data => incomingDataProvided(providerName, data)
           })
           initializedLiveProviders.push(providerName)
-        } else {
-          actionResults[providerName] = providerBeingExecuted
+        } else if (haveStateChanged(state.actionResults[providerName], providerBeingExecuted)) {
+          // console.log(providerName, state.actionResults[providerName], providerBeingExecuted)
+          updateActionResult(providerName, providerBeingExecuted)
         }
       }
     }
 
-    actionResults.getNativeCommands = nativeCommands
-    actionResults.route = global.window.location
-    actionResults.parseRootNodeDataset = { ...rootNode.dataset }
-    vDomState.rootNode = rootNode
-
-    if (!vDomState.vDomTree) {
-      vDomState.vDomTree = parser(rootNode)
-    }
+    updateState('actionResults', 'getNativeCommands', nativeCommands)
 
     await runProviders()
-    mountPage(renderPage({ actionResults, getSlot: createSlotRenderer() }))
+    rootNode.innerHTML = ''
+    onRenderApp(() => renderPage({ actionResults: state.actionResults, getSlot: createSlotRenderer() }), rootNode)
 
     if (typeof setupProps.afterProviders === 'function') {
       setupProps.afterProviders()
+    }
+
+    return {
+      commands: boundCommands,
+      store: state.actionResults
     }
   }
 }

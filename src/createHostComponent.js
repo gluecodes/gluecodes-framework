@@ -1,34 +1,57 @@
-export default ({
-  glueDomRenderer,
-  renderer
-}) => (
+export default ({ glueDomRenderer }) => (
   module,
   {
-    componentId,
-    getExternalStyles,
-    styles
+    globalStyles,
+    styleOverrides
   }
 ) => {
-  const { fa, others } = getExternalStyles()
-  const externalStyles = others
-  const componentClassMap = styles
-  const injectables = {
-    externalStyles,
-    fa
-  }
+  const unimportedClassNameProxy = new Proxy({}, {
+    get: (target, prop) => {
+      if (typeof prop === 'string' && prop !== '__proto__') {
+        return `unimported_${prop}`
+      }
 
-  for (const className of Object.keys(componentClassMap)) {
-    if (!module.customizableClasses.includes(className)) {
-      throw new TypeError(`Class .${className} of ${componentId}.component.css isn't declared as customizable`)
+      return null
     }
+  })
 
-    externalStyles[className] = [
-      ...(externalStyles[className] ? externalStyles[className].split(' ') : []),
-      componentClassMap[className]
-    ].join(' ')
+  const externalStylesProxy = new Proxy({}, {
+    get: (target, className) => {
+      if (!globalStyles.others) {
+        return unimportedClassNameProxy[className]
+      }
+
+      return Object.keys(globalStyles.others).reduce((acc, moduleName) => {
+        if (globalStyles.others[moduleName][className]) {
+          acc.push(globalStyles.others[moduleName][className])
+        }
+        return acc
+      }, []).join(' ')
+    }
+  })
+
+  const styleOverridesProxy = new Proxy({}, {
+    get: (target, className) => {
+      if (!globalStyles.others) {
+        return styleOverrides[className]
+      }
+
+      return Object.keys(globalStyles.others).reduce((acc, moduleName) => {
+        if (moduleName !== 'bootstrap' && globalStyles.others[moduleName][className]) {
+          acc.push(globalStyles.others[moduleName][className])
+        }
+
+        return acc
+      }, [styleOverrides[className]]).join(' ')
+    }
+  })
+
+  for (const className of Object.keys(styleOverrides)) {
+    if (!module.customizableClasses.includes(className)) {
+      throw new TypeError(`Class .${className} isn't declared as customizable`)
+    }
   }
 
-  module.setRenderer(renderer)
   module.setGlueDomRenderer(glueDomRenderer)
 
   // import fonts
@@ -49,38 +72,12 @@ export default ({
     global.document.head.appendChild(fontFaceNode)
   })
 
-  return (props) => {
-    const vDomNode = module.render({
-      ...props,
-      _inject: injectables
-    })
-
-    if (typeof vDomNode === 'function' && vDomNode.constructor.name !== 'VirtualNode') {
-      const thunkComponent = vDomNode
-
-      return (...args) => {
-        const vDomNode = thunkComponent(...args)
-
-        if (vDomNode) {
-          vDomNode.properties.className = `${vDomNode.properties.className || ''} gc-role-${componentId}`.trim()
-        }
-
-        return vDomNode
-      }
+  return props => module.render({
+    ...props,
+    _inject: {
+      externalStyles: externalStylesProxy,
+      fa: globalStyles.fa,
+      styleOverrides: styleOverridesProxy
     }
-
-    if (Array.isArray(vDomNode)) {
-      vDomNode.forEach((node) => {
-        node.properties.className = `${node.properties.className || ''} gc-role-${componentId}`.trim()
-      })
-
-      return vDomNode
-    }
-
-    if (vDomNode) {
-      vDomNode.properties.className = `${vDomNode.properties.className || ''} gc-role-${componentId}`.trim()
-    }
-
-    return vDomNode
-  }
+  })
 }

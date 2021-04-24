@@ -1,46 +1,66 @@
-export default ({
-  glueDomPrerenderer,
-  prerenderer
-}) => (
+export default ({ glueDomPrerenderer }) => (
   module,
   {
-    componentId,
-    getExternalStyles,
-    styles
+    globalStyles,
+    styleOverrides
   },
   props
 ) => {
-  const { fa, others } = getExternalStyles()
-  const externalStyles = others
-  const componentClassMap = styles
+  const unimportedClassNameProxy = new Proxy({}, {
+    get: (target, prop) => {
+      if (typeof prop === 'string' && prop !== '__proto__') {
+        return `unimported_${prop}`
+      }
 
-  for (const className of Object.keys(componentClassMap)) {
-    if (!module.customizableClasses.includes(className)) {
-      throw new TypeError(`Class .${className} of ${componentId}.component.css isn't declared as customizable`)
+      return null
     }
+  })
 
-    externalStyles[className] = [
-      ...(externalStyles[className] ? externalStyles[className].split(' ') : []),
-      componentClassMap[className]
-    ].join(' ')
+  const externalStylesProxy = new Proxy({}, {
+    get: (target, className) => {
+      if (!globalStyles.others) {
+        return unimportedClassNameProxy[className]
+      }
+
+      return Object.keys(globalStyles.others).reduce((acc, moduleName) => {
+        if (globalStyles.others[moduleName][className]) {
+          acc.push(globalStyles.others[moduleName][className])
+        }
+
+        return acc
+      }, []).join(' ')
+    }
+  })
+
+  const styleOverridesProxy = new Proxy({}, {
+    get: (target, className) => {
+      if (!globalStyles.others) {
+        return styleOverrides[className]
+      }
+
+      return Object.keys(globalStyles.others).reduce((acc, moduleName) => {
+        if (moduleName !== 'bootstrap' && globalStyles.others[moduleName][className]) {
+          acc.push(globalStyles.others[moduleName][className])
+        }
+        return acc
+      }, [styleOverrides[className]]).join(' ')
+    }
+  })
+
+  for (const className of Object.keys(styleOverrides)) {
+    if (!module.customizableClasses.includes(className)) {
+      throw new TypeError(`Class .${className} isn't declared as customizable`)
+    }
   }
 
-  module.setPrerenderer(prerenderer)
   module.setGlueDomPrerenderer(glueDomPrerenderer)
 
-  const html = module.prerender({
+  return module.prerender({
     ...props,
     _inject: {
-      externalStyles,
-      fa
+      externalStyles: externalStylesProxy,
+      fa: globalStyles.fa,
+      styleOverrides: styleOverridesProxy
     }
-  }).trim()
-
-  let scopedHtml = html.replace(/^(<[^<>]+)(class="[^"]*)/, `$1$2 gc-role-${componentId}`)
-
-  if (scopedHtml === html) {
-    scopedHtml = html.replace(/^(<[^<>]+)/, `$1 class="gc-role-${componentId}"`)
-  }
-
-  return scopedHtml
+  }).t
 }
