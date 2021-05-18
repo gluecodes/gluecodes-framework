@@ -1,88 +1,30 @@
-<p align="center"><a href="https://www.glue.codes" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/logogithub.png" alt="GlueCodes logo"></a></p>
+<p align="left"><a href="https://www.glue.codes" target="_blank" rel="noopener noreferrer"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/logogithub.png" alt="GlueCodes logo"></a></p>
 
-<h2 align="center">@gluecodes/framework (Beta)</h2>
+# @gluecodes/framework
 
-<p align="center">A simplistic Redux-inspired frontend web framework that is automated by its own IDE</p>
+Data flow management library for [SolidJS](http://solidjs.com/) that powers [GlueCodes Studio](https://ide.glue.codes).
 
-<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/ide.png" alt="GlueCodes IDE"></p>
+See [Documentation](https://www.glue.codes/docs.html).
 
-<h2 align="center">Demo</h2>
-
-<p align="center"><a href="https://ide.glue.codes/ide.html?appId=1&edit=page&id=index" target="_blank" rel="noopener noreferrer"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/liveDemo.gif" alt="GlueCodes live demo"></a></p>
-
-<h2 align="center">Goals</h2>
-
-<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/goldenGoals.gif" alt="Golden Goals"></p>
-
-<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/silverGoals.gif" alt="Silver Goals"></p>
-
-<h2 align="center">Dev experience</h2>
-
-<p align="center"><img width="100%" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/experience.png" alt="Dev Experience"></p>
-
-<p align="center"><img width="100" src="https://github.com/gluecodes/gluecodes-framework/blob/master/mediaFiles/dictionary.png" alt="Vocabulary"></p>
-
-<h2 align="center">Vocabulary</h2>
-
-- __command__ - an action triggered by a user e.g. via DOM event
-- __component__ - a pure function which returns an instance of Virtual DOM and can be reused across multiple projects
-- __layout__ - a function which the only role is to lay down slots, hence it does not have access to the store, nor commands
-- __provider__ - an action executed prior rendering which provide initial data and make those actions pipe the store through
-- __reusable slot__ - a piece of UI to be reused across pages within an app which has read access to the store and, may trigger commands
-- __slot__ - a logically separated UI section which have read access to the store and, may trigger commands
-- __store__ - a central app state
-
-<h2 align="center">App state flow</h2>
-
-There is a uni-directional app state flow which populates a single store. See example below.
-
-1. The app is bootstrapping.
-2. Providers are triggered piping through the store. Each of them writes to the store by resolving or returning. (result of `getTodos` is passed to `getFilteredTodos`).
-3. Last Provider in the pipeline (`getFilteredTodos`) stores its result and triggers rendering.
-4. Rendering layer passes the store as `actionResults` and Commands as `actions`.
-5. User types in a filter string which triggers a Command (`filterTodos`).
-6. Command: `filterTodos` writes to the store and triggers rendering.
-7. Core Command: `reload` re-triggers whole cycle.
-
-<p align="center"><a href="http://www.youtube.com/watch?v=CJ451ccca2M"><img alt="Schema" src="http://img.youtube.com/vi/CJ451ccca2M/0.jpg"/></a></p>
-
-<h2 align="center">Rendering</h2>
-
-Every time a Command is triggered, Virtual DOM performs full-page re-render to give all Slots read access to the Command result via Store.
- 
-There is a core 'reload' Command to re-trigger Providers and then perform re-rendering. 
-It's meant to be called right after the Command handling particular app event resolved (usually it happens in DOM event handler).
-Since Providers pipe through the store, after 'reload', they may access result of the Command.  
-
-<h2 align="center">Components</h2>
-
-Slots are not Components. Components are pure functions which receive immutable, non-app specific props.
-
-<h2 align="center">Installation</h2>
+## Installation
 
 Run:
 ```bash
-yarn add http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-1.0.0.tar.gz
+yarn add https://ide.glue.codes/repos/df67f7a82cbdc5efffcb31c519a48bf6/core/framework-1.0.1.tar.gz
 ```
 Or:
 ```bash
-npm i http://gluecodes-components.s3-website-eu-west-1.amazonaws.com/framework-1.0.0.tar.gz
+npm i https://ide.glue.codes/repos/df67f7a82cbdc5efffcb31c519a48bf6/core/framework-1.0.1.tar.gz --save
 ```
-
-<h2 align="center">Usage</h2>
-
-Explore [TodoMVC app](https://github.com/gluecodes/gluecodes-todomvc) to get an idea of how the framework may be used.
-
-
-<h2 align="center">Contributing</h2>
+## Contributing
 
 Feel free to rise issues, open PRs or contact at hello@glue.codes about any ideas/criticism.
 
-### Prerequisites
+## Prerequisites
 
 - Docker
 
-### Installation
+## Installation
 
 - Run:
 ```bash  
@@ -93,7 +35,7 @@ cp .env_template .env
 docker-compose up 
 ```
 
-### Scripts
+## Scripts
 
 Build:
 ```bash 
@@ -114,7 +56,6 @@ docker exec -it gluecodes_framework npm run lint
 
 - [Chris Czopp](https://github.com/chris-czopp)
 - [Przemyslaw Michalak](https://github.com/w-eagle)
-- [Sam House](https://github.com/house92)
 
 ## License
 

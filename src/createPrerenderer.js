@@ -69,7 +69,7 @@ const stringifyNode = (name, props, children) => {
     .reduce((acc, propName) => {
       if (propName === 'className') {
         acc.push(`class="${props[propName]}"`)
-      } else if (propName === 'attributes') {
+      } else if (propName === 'attrs') {
         Object.keys(props[propName]).forEach((attrName) => {
           acc.push(`${attrName}="${props[propName][attrName]}"`)
         })
